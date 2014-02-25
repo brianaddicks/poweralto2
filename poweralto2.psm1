@@ -1,8 +1,10 @@
-﻿Add-Type -ReferencedAssemblies @(
+﻿$ScriptPath = Split-Path $($MyInvocation.MyCommand).Path
+
+Add-Type -ReferencedAssemblies @(
 	([System.Reflection.Assembly]::LoadWithPartialName("System.Xml")).Location,
 	([System.Reflection.Assembly]::LoadWithPartialName("System.Web")).Location,
 	([System.Reflection.Assembly]::LoadWithPartialName("System.Xml.Linq")).Location
-	) -TypeDefinition ((gc .\poweralto2.cs) -join "`n")
+	) -TypeDefinition ((gc "$ScriptPath\poweralto2.cs") -join "`n")
 
 ###############################################################################
 Add-Type -AssemblyName System.Management.Automation
