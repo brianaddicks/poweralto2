@@ -139,8 +139,8 @@ function Get-PaDevice {
 
 function Get-PaConfig {
 	Param (
-		[Parameter(Mandatory=$True,Position=0)]
-		[string]$Xpath,
+		[Parameter(Mandatory=$False,Position=0)]
+		[string]$Xpath = "/config",
 
         [Parameter(Mandatory=$False,Position=1)]
         [switch]$Candidate
