@@ -6,8 +6,11 @@ Add-Type -ReferencedAssemblies @(
 	([System.Reflection.Assembly]::LoadWithPartialName("System.Xml.Linq")).Location
 	) -TypeDefinition ((gc "$ScriptPath\poweralto2.cs") -join "`n")
 
-###############################################################################
 Add-Type -AssemblyName System.Management.Automation
+
+###############################################################################
+## Start Powershell Cmdlets
+###############################################################################
 
 function Get-PaDevice {
 	<#
@@ -137,28 +140,49 @@ function Get-PaDevice {
     }
 }
 
+###############################################################################
+
 function Get-PaConfig {
 	Param (
 		[Parameter(Mandatory=$False,Position=0)]
 		[string]$Xpath = "/config",
 
         [Parameter(Mandatory=$False,Position=1)]
-        [switch]$Candidate
+        [ValidateSet("get","show")]
+        [string]$Action
     )
 
     HelperCheckPaConnection
 
-    $QueryTable = @{ type  = "config"
-                     xpath = $Xpath   }
-    
-    if ($Candidate) { $QueryTable.Add('action','get')  } `
-               else { $QueryTable.Add('action','show') }
+    $QueryTable = @{ type   = "config"
+                     xpath  = $Xpath
+                     action = $Action  }
     
     $QueryString = HelperCreateQueryString $QueryTable
     $Url         = $PaDeviceObject.UrlBuilder($QueryString)
     $Response    = HelperHttpQuery $Url -AsXML
 
     return HelperCheckPaError $Response
+}
+
+function Get-PaSecurityRule {
+    Param (
+		[Parameter(Mandatory=$False,Position=0)]
+		[string]$Name,
+
+        [Parameter(Mandatory=$False)]
+        [switch]$Candidate
+    )
+
+    $Xpath = "/config/devices/entry/vsys/entry/rulebase/security/rules"
+
+    if ($Name) { $Xpath += "/entry[@name='$Name']" }
+
+    if ($Candidate) { $Action = "get"  } `
+               else { $Action = "show" }
+    
+    return Get-PaConfig -Xpath $Xpath -Action $Action
+
 }
 
 ###############################################################################
