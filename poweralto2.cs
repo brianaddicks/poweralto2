@@ -172,7 +172,13 @@ namespace PowerAlto {
 			if (!this.Tags.Any()) {
 				XElement ThisTags = new XElement("tag");
 				
+				foreach (string ThisTag in this.Tags) {
+					ThisTags.Add(
+						new XElement("member",ThisTag)
+					);
+				}
 				
+				XmlObject.Element("XmlObject").Add(ThisTags);
 			}
 			// return beautiful, well-formatted xml
 			return XmlObject.ToString();
