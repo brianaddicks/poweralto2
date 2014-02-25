@@ -92,7 +92,7 @@ function Get-PaDevice {
 			
 			$PaDeviceObject.Protocol = $Protocol
 			$PaDeviceObject.Port     = $Port
-			$PaDeviceObject.Server   = $Server
+			$PaDeviceObject.Device   = $Device
 
             if ($ApiKey) {
                 $PaDeviceObject.ApiKey = $ApiKey
@@ -101,43 +101,105 @@ function Get-PaDevice {
                 $Password = $PaCred.getnetworkcredential().password
             }
 			
-			$PrtgServerObject.OverrideValidation()
+			$PaDeviceObject.OverrideValidation()
 		}
     }
 
     PROCESS {
         
 		$url = $PaDeviceObject.UrlBuilder("op","<show><system><info></info></system></show>")
-        $url
 
-<#
-		try {
-			$QueryObject = HelperHTTPQuery $url -AsXML
-		} catch {
-			throw "Error performing HTTP query"
-		}
-		
-		$Data = $QueryObject.Data
+		try   { $QueryObject = HelperHTTPQuery $url -AsXML } `
+        catch {	throw "Error performing HTTP query"	       }
 
-		$data.status.ChildNodes | % {
-			if ($_.Name -ne "IsAdminUser") {
-				$PrtgServerObject.$($_.Name) = $_.InnerText
-			} else {
-				# TODO
-				# there's at least four properties that need to be treated this way
-				# this is because this property returns a text "true" or "false", which powershell always evaluates as "true"
-				$PrtgServerObject.$($_.Name) = [System.Convert]::ToBoolean($_.InnerText)
-			}
-		}
-		
-        $global:PrtgServerObject = $PrtgServerObject
+		$Data = $QueryObject.data.response.result.system
 
-		#HelperFormatTest ###### need to add this back in
+        $PaDeviceObject.Name            = $Data.hostname
+        $PaDeviceObject.Model           = $Data.model
+        $PaDeviceObject.Serial          = $Data.serial
+        $PaDeviceObject.OsVersion       = $Data.'sw-version'
+        $PaDeviceObject.GpAgent         = $Data.'global-protect-client-package-version'
+        $PaDeviceObject.AppVersion      = $Data.'app-version'
+        $PaDeviceObject.ThreatVersion   = $Data.'threat-version'
+        $PaDeviceObject.WildFireVersion = $Data.'wildfire-version'
+        $PaDeviceObject.UrlVersion      = $Data.'url-filtering-version'
+
+        $global:PaDeviceObject = $PaDeviceObject
+
 		
 		if (!$Quiet) {
-			return $PrtgServerObject | Select-Object @{n='Connection';e={$_.ApiUrl}},UserName,Version
+			return $PaDeviceObject | Select-Object @{n='Connection';e={$_.ApiUrl}},Name,OsVersion
 		}
 #>
     
     }
 }
+
+###############################################################################
+
+function HelperHTTPQuery {
+	Param (
+		[Parameter(Mandatory=$True,Position=0)]
+		[string]$URL,
+
+		[Parameter(Mandatory=$False)]
+		[alias('xml')]
+		[switch]$AsXML
+	)
+
+	try {
+		$Response = $null
+		$Request = [System.Net.HttpWebRequest]::Create($URL)
+		$Response = $Request.GetResponse()
+		if ($Response) {
+			$StatusCode = $Response.StatusCode.value__
+			$DetailedError = $Response.GetResponseHeader("X-Detailed-Error")
+		}
+	}
+	catch {
+		$ErrorMessage = $Error[0].Exception.ErrorRecord.Exception.Message
+		$Matched = ($ErrorMessage -match '[0-9]{3}')
+		if ($Matched) {
+			throw ('HTTP status code was {0} ({1})' -f $HttpStatusCode, $matches[0])
+		}
+		else {
+			throw $ErrorMessage
+		}
+
+		#$Response = $Error[0].Exception.InnerException.Response
+		#$Response.GetResponseHeader("X-Detailed-Error")
+	}
+
+	if ($Response.StatusCode -eq "OK") {
+		$Stream    = $Response.GetResponseStream()
+		$Reader    = New-Object IO.StreamReader($Stream)
+		$FullPage  = $Reader.ReadToEnd()
+
+		if ($AsXML) {
+			$Data = [xml]$FullPage
+		} else {
+			$Data = $FullPage
+		}
+
+		$Global:LastResponse = $Data
+
+		$Reader.Close()
+		$Stream.Close()
+		$Response.Close()
+	} else {
+		Throw "Error Accessing Page $FullPage"
+	}
+
+	$ReturnObject = "" | Select-Object StatusCode,DetailedError,Data
+	$ReturnObject.StatusCode = $StatusCode
+	$ReturnObject.DetailedError = $DetailedError
+	$ReturnObject.Data = $Data
+
+	return $ReturnObject
+}
+
+###############################################################################
+## PowerShell Module Functions
+###############################################################################
+
+Export-ModuleMember *-*

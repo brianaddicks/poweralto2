@@ -44,16 +44,20 @@ namespace PowerAlto {
 			}
 		}
 		
-		if (!string.IsNullOrEmpty(this.ApiKey)) {
-			return "key=" + this.ApiKey;
-		} else {
-			return null;
+		public string AuthString {
+			get {
+				if (!string.IsNullOrEmpty(this.ApiKey)) {
+					return "key=" + this.ApiKey;
+				} else {
+					return null;
+				}
+			}
 		}
 
 	
 		public string PowerAltoVersion {
 			get {
-				return poweraltoversion;
+				return this.poweraltoversion;
 			}
 		}
 	
@@ -73,7 +77,6 @@ namespace PowerAlto {
 				this.clock = value;
 			}
 		}
-		public string Version { get; set; }
 		
 		public string[] UrlHistory {
 			get {
