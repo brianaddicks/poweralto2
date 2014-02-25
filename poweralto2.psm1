@@ -2,7 +2,7 @@
 	([System.Reflection.Assembly]::LoadWithPartialName("System.Xml")).Location,
 	([System.Reflection.Assembly]::LoadWithPartialName("System.Web")).Location,
 	([System.Reflection.Assembly]::LoadWithPartialName("System.Xml.Linq")).Location
-	) -TypeDefinition ((gc c:\dev\poweralto2\poweralto2.cs) -join "`n")
+	) -TypeDefinition ((gc .\poweralto2.cs) -join "`n")
 
 ###############################################################################
 Add-Type -AssemblyName System.Management.Automation
@@ -78,6 +78,7 @@ function Get-PaDevice {
 	)
 
     BEGIN {
+
 		if ($HttpOnly) {
 			$Protocol = "http"
 			if (!$Port) { $Port = 80 }
