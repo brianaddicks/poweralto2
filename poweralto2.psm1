@@ -146,6 +146,8 @@ function Get-PaConfig {
         [switch]$Candidate
     )
 
+    HelperCheckPaConnection
+
     $QueryTable = @{ type  = "config"
                      xpath = $Xpath   }
     
@@ -163,6 +165,12 @@ function Get-PaConfig {
 ## Start Helper Functions
 ###############################################################################
 
+function HelperCheckPaConnection {
+    if (!($Global:PaDeviceObject)) {
+        Throw "Not connected to any Palo Alto Devices."
+    }
+}
+
 function HelperCheckPaError {
 	Param (
 	    [Parameter(Mandatory=$True,Position=0)]
@@ -173,7 +181,7 @@ function HelperCheckPaError {
     if ($Status -eq "error") {
         if ($Response.data.response.msg.line) { $ErrorMessage = $Response.data.response.msg.line } `
                                          else { $ErrorMessage = $Response.data.response.msg      }
-        Throw $ErrorMessage
+        Throw "$ErrorMessage`."
     } else {
         return $Response.data.response.result
     }
