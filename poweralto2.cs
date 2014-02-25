@@ -118,4 +118,73 @@ namespace PowerAlto {
 			ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3;
 		}
 	}
+	
+	public class SecurityRule {
+		public string Name { get; set; }
+		public string Description { get; set; }
+		public List<string> Tags { get; set; }
+		
+		public List<string> SourceZone { get; set; }
+		public List<string> SourceAddress { get; set; }
+		public bool SourceNegate { get; set; }
+		
+		public List<string> SourceUser { get; set; }
+		public List<string> HipProfiles { get; set; }
+		
+		public List<string> DestinationZone { get; set; }
+		public List<string> DestinationAddress { get; set; }
+		public bool DestinationNegate { get; set; }
+		
+		public List<string> Applications { get; set; }
+		
+		public List<string> Service { get; set; }
+		public List<string> UrlCategory { get; set; }
+		
+		public bool Allow { get; set; } //true = allow, false = deny
+		
+		public string ProfileGroup { get; set; }
+		
+		public string AntivirusProfile { get; set; }
+		public string VulnerabilityProfile { get; set; }
+		public string AntiSpywareProfile { get; set; }
+		public string UrlFilteringProfile { get; set; }
+		public string FileBlockingProfile { get; set; }
+		public string DataFilteringProfile { get; set; }
+		
+		public bool LogAtSessionStart { get; set; }
+		public bool LogAtSessionEnd { get; set; }
+		public string LogForwarding { get; set; }
+		
+		public string Schedule { get; set; }
+		public string QoSMarking { get; set; }
+		
+		public bool DisableSRI { get; set; }
+		
+		// No root is created for this as it would be under the "name", which is provided in the xpath
+		public string PrintOutput () {
+			
+			// Set Description
+			XDocument XmlObject = new XDocument(
+				new XElement("description",this.Description)
+			);
+			
+			// Set Tags
+			if (!this.Tags.Any()) {
+				XElement ThisTags = new XElement("tag");
+				
+				
+			}
+			// return beautiful, well-formatted xml
+			return XmlObject.ToString();
+		}
+	}
 }
+
+
+
+
+
+
+
+
+
