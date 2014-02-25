@@ -89,18 +89,18 @@ namespace PowerAlto {
 		}
 		
 		
-		public string UrlBuilder (string QueryType, string Query) {
+		public string UrlBuilder (string QueryString) {
 			
-			string[] Pieces = new string[6];
+			string[] Pieces = new string[5];
 			Pieces[0] = this.ApiUrl;
-			Pieces[1] = "?type=";
-			Pieces[2] = QueryType;
+			Pieces[1] = "?";
+			Pieces[2] = this.AuthString;
 			Pieces[3] = "&";
-			Pieces[4] = this.AuthString;
+			Pieces[4] = QueryString;
 			
-			if (QueryType == "op") {
-				Pieces[5] += ("&cmd=" + Query);
-			}
+			//if (QueryType == "op") {
+			//	Pieces[5] += ("&cmd=" + Query);
+			//}
 			
 			string CompletedString = string.Join ("",Pieces);
 			

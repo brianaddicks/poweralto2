@@ -107,7 +107,11 @@ function Get-PaDevice {
 
     PROCESS {
         
-		$url = $PaDeviceObject.UrlBuilder("op","<show><system><info></info></system></show>")
+        $QueryStringTable = @{ type = "op"
+                               cmd  = "<show><system><info></info></system></show>" }
+
+        $QueryString = HelperCreateQueryString $QueryStringTable
+		$url         = $PaDeviceObject.UrlBuilder($QueryString)
 
 		try   { $QueryObject = HelperHTTPQuery $url -AsXML } `
         catch {	throw "Error performing HTTP query"	       }
@@ -130,12 +134,51 @@ function Get-PaDevice {
 		if (!$Quiet) {
 			return $PaDeviceObject | Select-Object @{n='Connection';e={$_.ApiUrl}},Name,OsVersion
 		}
-#>
-    
     }
 }
 
+function Get-PaConfig {
+	Param (
+		[Parameter(Mandatory=$True,Position=0)]
+		[string]$Xpath,
+
+        [Parameter(Mandatory=$False,Position=1)]
+        [switch]$Candidate
+    )
+
+    $QueryTable = @{ type  = "config"
+                     xpath = $Xpath   }
+    
+    if ($Candidate) { $QueryTable.Add('action','get')  } `
+               else { $QueryTable.Add('action','show') }
+    
+    $QueryString = HelperCreateQueryString $QueryTable
+    $Url         = $PaDeviceObject.UrlBuilder($QueryString)
+    $Response    = HelperHttpQuery $Url -AsXML
+
+    return HelperCheckPaError $Response
+}
+
 ###############################################################################
+## Start Helper Functions
+###############################################################################
+
+function HelperCheckPaError {
+	Param (
+	    [Parameter(Mandatory=$True,Position=0)]
+	    $Response
+    )
+
+    $Status = $Response.data.response.status
+    if ($Status -eq "error") {
+        if ($Response.data.response.msg.line) { $ErrorMessage = $Response.data.response.msg.line } `
+                                         else { $ErrorMessage = $Response.data.response.msg      }
+        Throw $ErrorMessage
+    } else {
+        return $Response.data.response.result
+    }
+}
+
 
 function HelperHTTPQuery {
 	Param (
@@ -198,8 +241,23 @@ function HelperHTTPQuery {
 	return $ReturnObject
 }
 
+function HelperCreateQueryString {
+    Param (
+        [Parameter(Mandatory=$True,Position=0)]
+		[hashtable]$QueryTable
+    )
+
+    $QueryString = [System.Web.httputility]::ParseQueryString("")
+
+    foreach ($Pair in $QueryTable.GetEnumerator()) {
+	    $QueryString[$($Pair.Name)] = $($Pair.Value)
+    }
+
+    return $QueryString.ToString()
+}
+
 ###############################################################################
-## PowerShell Module Functions
+## End Helper Functions
 ###############################################################################
 
 Export-ModuleMember *-*
