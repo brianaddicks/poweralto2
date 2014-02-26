@@ -160,29 +160,34 @@ namespace PowerAlto {
 		
 		public bool DisableSRI { get; set; }
 		
-		// No root is created for this as it would be under the "name", which is provided in the xpath
 		public string PrintOutput () {
-			
-			// Set Description
+                    
+			// Create root, this will be stripped off, but is required to use the builtin xml functions
 			XDocument XmlObject = new XDocument(
-				new XElement("description",this.Description)
+				new XElement("fakeroot")
 			);
 			
-			// Set Tags
-			if (!this.Tags.Any()) {
-				XElement ThisTags = new XElement("tag");
-				
-				foreach (string ThisTag in this.Tags) {
-					ThisTags.Add(
-						new XElement("member",ThisTag)
-					);
-				}
-				
-				XmlObject.Element("XmlObject").Add(ThisTags);
+			if (!(String.IsNullOrEmpty(this.Description))) {
+				XElement ThisDescription = new XElement("description",this.Description);
+				XmlObject.Element("fakeroot").Add(ThisDescription);
 			}
-			// return beautiful, well-formatted xml
-			return XmlObject.ToString();
-		}
+			
+			 // Set Tags
+			 if (this.Tags != null) {
+				   XElement ThisTags = new XElement("tag");
+				  
+				   foreach (string ThisTag in this.Tags) {
+						  ThisTags.Add(
+								 new XElement("member",ThisTag)
+						  );
+				   }
+				  
+				   XmlObject.Element("faleroot").Add(ThisTags);
+			 }
+			 // return beautiful, well-formatted xml
+			
+			 return XmlObject.Element("fakeroot").ToString();
+	    }
 	}
 }
 
