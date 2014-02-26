@@ -120,6 +120,8 @@ namespace PowerAlto {
 	}
 	
 	public class SecurityRule {
+		private bool IsGroup = false;
+		
 		public string Name { get; set; }
 		public string Description { get; set; }
 		public List<string> Tags { get; set; }
@@ -142,9 +144,31 @@ namespace PowerAlto {
 		
 		public bool Allow { get; set; } //true = allow, false = deny
 		
-		public string ProfileGroup { get; set; }
+		private string profilegroup;
+		public string ProfileGroup {
+			get {
+				return this.profilegroup;
+			}
+			set {
+				this.profilegroup = value;
+				this.IsGroup = true;
+			}
+		}
+		/*
+		public string AntivirusProfile {
+			get {
+				return this.AntivirusProfile;
+			}
+			set {
+				this.AntivirusProfile = value;
+				this.IsGroup = false;
+			}
+		}
+		*/
 		
+		//public string ProfileGroup { get; set; }
 		public string AntivirusProfile { get; set; }
+		
 		public string VulnerabilityProfile { get; set; }
 		public string AntiSpywareProfile { get; set; }
 		public string UrlFilteringProfile { get; set; }
@@ -356,6 +380,11 @@ namespace PowerAlto {
 					)
 				);
 				XmlObject.Element("fakeroot").Add(ThisProfileGroup);
+			}
+			
+			// Set Individual Profiles
+			if (!this.IsGroup) {
+				XElement ThisProfileSetting = new XElement("profile-setting");
 			}
 			
 			// return beautiful, well-formatted xml
