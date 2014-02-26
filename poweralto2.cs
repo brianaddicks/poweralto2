@@ -194,7 +194,8 @@ namespace PowerAlto {
 		public string LogForwarding { get; set; }
 		
 		public string Schedule { get; set; }
-		public string QoSMarking { get; set; }
+		public string QosType { get; set; }
+		public string QosMarking { get; set; }
 		
 		public bool DisableSRI { get; set; }
 		
@@ -484,6 +485,22 @@ namespace PowerAlto {
 				XmlObject.Element("fakeroot").Add(ScheduleXml);
 			}
 			
+			if (!(String.IsNullOrEmpty(this.QosMarking)) && !(String.IsNullOrEmpty(this.QosType))) {
+				XElement QosXml = new XElement("qos",
+					new XElement("marking")
+				);
+				
+				if (this.QosType == "dscp") {
+					XElement QosMarkingXml = new XElement("ip-dscp",this.QosMarking);
+					QosXml.Element("marking").Add(QosMarkingXml);
+				} else {
+					XElement QosMarkingXml = new XElement("ip-precedence",this.QosMarking);
+					QosXml.Element("marking").Add(QosMarkingXml);
+				}
+				
+				XmlObject.Element("fakeroot").Add(QosXml);
+			}
+			
 			
 			// return beautiful, well-formatted xml
 			return XmlObject.Element("fakeroot").ToString();
@@ -493,9 +510,6 @@ namespace PowerAlto {
 
 /*
 public string Name { get; set; }
-		
-		public string Schedule { get; set; }
-		public string QoSMarking { get; set; }
 		
 		public bool DisableSRI { get; set; }
 */
