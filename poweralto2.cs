@@ -172,30 +172,96 @@ namespace PowerAlto {
 				XmlObject.Element("fakeroot").Add(ThisDescription);
 			}
 			
-			 // Set Tags
-			 if (this.Tags != null) {
-				   XElement ThisTags = new XElement("tag");
+			// Set Tags
+			if (this.Tags != null) {
+				XElement ThisTags = new XElement("tag");
 				  
-				   foreach (string ThisTag in this.Tags) {
-						  ThisTags.Add(
-								 new XElement("member",ThisTag)
-						  );
-				   }
-				  
-				   XmlObject.Element("faleroot").Add(ThisTags);
-			 }
-			 // return beautiful, well-formatted xml
+				foreach (string ThisTag in this.Tags) {
+					ThisTags.Add(
+						new XElement("member",ThisTag)
+					);
+				}
+				XmlObject.Element("fakeroot").Add(ThisTags);
+			}
 			
-			 return XmlObject.Element("fakeroot").ToString();
+			// Set Source Zones
+			
+			XElement ThisSourceZones = new XElement("from");
+			
+			if (this.SourceZone != null) {			
+				foreach (string ThisSourceZone in this.SourceZone) {
+					ThisSourceZones.Add(
+						new XElement("member",ThisSourceZone)
+					);
+				}
+			} else {
+				ThisSourceZones.Add(
+					new XElement("member","any")
+				);
+			}
+			
+			XmlObject.Element("fakeroot").Add(ThisSourceZones);
+			
+			// Set Source Addresses
+			
+			XElement ThisSourceAddresses = new XElement("source");
+			
+			if (this.SourceAddress != null) {			
+				foreach (string ThisSourceAddress in this.SourceAddress) {
+					ThisSourceAddresses.Add(
+						new XElement("member",ThisSourceAddress)
+					);
+				}
+			} else {
+				ThisSourceAddresses.Add(
+					new XElement("member","any")
+				);
+			}
+			
+			XmlObject.Element("fakeroot").Add(ThisSourceAddresses);
+			
+			
+			// return beautiful, well-formatted xml
+			return XmlObject.Element("fakeroot").ToString();
 	    }
 	}
 }
 
-
-
-
-
-
-
-
-
+/*
+public string Name { get; set; }
+		public List<string> SourceZone { get; set; }
+		public List<string> SourceAddress { get; set; }
+		public bool SourceNegate { get; set; }
+		
+		public List<string> SourceUser { get; set; }
+		public List<string> HipProfiles { get; set; }
+		
+		public List<string> DestinationZone { get; set; }
+		public List<string> DestinationAddress { get; set; }
+		public bool DestinationNegate { get; set; }
+		
+		public List<string> Applications { get; set; }
+		
+		public List<string> Service { get; set; }
+		public List<string> UrlCategory { get; set; }
+		
+		public bool Allow { get; set; } //true = allow, false = deny
+		
+		public string ProfileGroup { get; set; }
+		
+		public string AntivirusProfile { get; set; }
+		public string VulnerabilityProfile { get; set; }
+		public string AntiSpywareProfile { get; set; }
+		public string UrlFilteringProfile { get; set; }
+		publsic string FileBlockingProfile { get; set; }
+		public string DataFilteringProfile { get; set; }
+		
+		public bool LogAtSessionStart { get; set; }
+		public bool LogAtSessionEnd { get; set; }
+		public string LogForwarding { get; set; }
+		
+		public string Schedule { get; set; }
+		public string QoSMarking { get; set; }
+		
+		public bool DisableSRI { get; set; }
+*/
