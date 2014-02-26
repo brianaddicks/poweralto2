@@ -129,13 +129,13 @@ namespace PowerAlto {
 		public bool SourceNegate { get; set; }
 		
 		public List<string> SourceUser { get; set; }
-		public List<string> HipProfiles { get; set; }
+		public List<string> HipProfile { get; set; }
 		
 		public List<string> DestinationZone { get; set; }
 		public List<string> DestinationAddress { get; set; }
 		public bool DestinationNegate { get; set; }
 		
-		public List<string> Applications { get; set; }
+		public List<string> Application { get; set; }
 		
 		public List<string> Service { get; set; }
 		public List<string> UrlCategory { get; set; }
@@ -224,33 +224,122 @@ namespace PowerAlto {
 			
 			if (this.SourceNegate) {
 				XElement ThisSourceNegate = new XElement("negate-source","yes");
+				XmlObject.Element("fakeroot").Add(ThisSourceNegate);
 			} else {
 				XElement ThisSourceNegate = new XElement("negate-source","no");
+				XmlObject.Element("fakeroot").Add(ThisSourceNegate);
 			}
 			
-			XmlObject.Element("fakeroot").Add(ThisSourceNegate);
+			// Set Source User
+			
+			XElement ThisSourceUsers = new XElement("source-user");
+			
+			if (this.SourceUser != null) {			
+				foreach (string ThisSourceUser in this.SourceUser) {
+					ThisSourceUsers.Add(
+						new XElement("member",ThisSourceUser)
+					);
+				}
+			} else {
+				ThisSourceUsers.Add(
+					new XElement("member","any")
+				);
+			}
+			
+			XmlObject.Element("fakeroot").Add(ThisSourceUsers);
+			
+			// Set Hip Profile
+			
+			XElement ThisHipProfiles = new XElement("hip-profiles");
+			
+			if (this.HipProfile != null) {			
+				foreach (string ThisHipProfile in this.HipProfile) {
+					ThisHipProfiles.Add(
+						new XElement("member",ThisHipProfile)
+					);
+				}
+			} else {
+				ThisHipProfiles.Add(
+					new XElement("member","any")
+				);
+			}
+			
+			XmlObject.Element("fakeroot").Add(ThisHipProfiles);
+			
+						// Set Destination Zones
+			
+			XElement ThisDestinationZones = new XElement("to");
+			
+			if (this.DestinationZone != null) {			
+				foreach (string ThisDestinationZone in this.DestinationZone) {
+					ThisDestinationZones.Add(
+						new XElement("member",ThisDestinationZone)
+					);
+				}
+			} else {
+				ThisDestinationZones.Add(
+					new XElement("member","any")
+				);
+			}
+			
+			XmlObject.Element("fakeroot").Add(ThisDestinationZones);
+			
+			// Set Destination Addresses
+			
+			XElement ThisDestinationAddresses = new XElement("destination");
+			
+			if (this.DestinationAddress != null) {			
+				foreach (string ThisDestinationAddress in this.DestinationAddress) {
+					ThisDestinationAddresses.Add(
+						new XElement("member",ThisDestinationAddress)
+					);
+				}
+			} else {
+				ThisDestinationAddresses.Add(
+					new XElement("member","any")
+				);
+			}
+			
+			XmlObject.Element("fakeroot").Add(ThisDestinationAddresses);
+			
+			// Set Destination Negate
+			
+			if (this.DestinationNegate) {
+				XElement ThisDestinationNegate = new XElement("negate-destination","yes");
+				XmlObject.Element("fakeroot").Add(ThisDestinationNegate);
+			} else {
+				XElement ThisDestinationNegate = new XElement("negate-destination","no");
+				XmlObject.Element("fakeroot").Add(ThisDestinationNegate);
+			}
+			
+			// Set Destination Addresses
+			
+			XElement ThisApplications = new XElement("application");
+			
+			if (this.Application != null) {			
+				foreach (string ThisApplication in this.Application) {
+					ThisApplications.Add(
+						new XElement("member",ThisApplication)
+					);
+				}
+			} else {
+				ThisApplications.Add(
+					new XElement("member","any")
+				);
+			}
+			
+			XmlObject.Element("fakeroot").Add(ThisApplications);
 			
 			// return beautiful, well-formatted xml
 			return XmlObject.Element("fakeroot").ToString();
-			
 	    }
 	}
 }
 
 /*
 public string Name { get; set; }
-		public List<string> SourceZone { get; set; }
-		public List<string> SourceAddress { get; set; }
-		public bool SourceNegate { get; set; }
 		
-		public List<string> SourceUser { get; set; }
-		public List<string> HipProfiles { get; set; }
-		
-		public List<string> DestinationZone { get; set; }
-		public List<string> DestinationAddress { get; set; }
-		public bool DestinationNegate { get; set; }
-		
-		public List<string> Applications { get; set; }
+		public List<string> Application { get; set; }
 		
 		public List<string> Service { get; set; }
 		public List<string> UrlCategory { get; set; }
