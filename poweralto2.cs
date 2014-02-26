@@ -427,7 +427,7 @@ namespace PowerAlto {
 					ThisProfileSetting.Element("profiles").Add(AntiSpywareProfileXml);
 				}
 				
-				// Set UrlFiltering Profile
+				// Set Url Filtering Profile
 				if (!(String.IsNullOrEmpty(this.UrlFilteringProfile))) {
 					XElement UrlFilteringProfileXml = new XElement("url-filtering",
 						new XElement("member",this.UrlFilteringProfile)
@@ -435,6 +435,13 @@ namespace PowerAlto {
 					ThisProfileSetting.Element("profiles").Add(UrlFilteringProfileXml);
 				}
 				
+				// Set File Blocking Profile
+				if (!(String.IsNullOrEmpty(this.FileBlockingProfile))) {
+					XElement FileBlockingProfileXml = new XElement("file-blocking",
+						new XElement("member",this.FileBlockingProfile)
+					);
+					ThisProfileSetting.Element("profiles").Add(FileBlockingProfileXml);
+				}
 				
 				XmlObject.Element("fakeroot").Add(ThisProfileSetting);
 			}
