@@ -472,6 +472,18 @@ namespace PowerAlto {
 				XmlObject.Element("fakeroot").Add(LogAtSessionEndXml);
 			}
 			
+			// Set Log Forwarding
+			if (!(String.IsNullOrEmpty(this.LogForwarding))) {
+				XElement LogForwardingXml = new XElement("log-setting",this.LogForwarding);
+				XmlObject.Element("fakeroot").Add(LogForwardingXml);
+			}
+			
+			// Set Schedule
+			if (!(String.IsNullOrEmpty(this.Schedule))) {
+				XElement ScheduleXml = new XElement("schedule",this.Schedule);
+				XmlObject.Element("fakeroot").Add(ScheduleXml);
+			}
+			
 			
 			// return beautiful, well-formatted xml
 			return XmlObject.Element("fakeroot").ToString();
@@ -481,10 +493,6 @@ namespace PowerAlto {
 
 /*
 public string Name { get; set; }
-
-		public bool LogAtSessionStart { get; set; }
-		public bool LogAtSessionEnd { get; set; }
-		public string LogForwarding { get; set; }
 		
 		public string Schedule { get; set; }
 		public string QoSMarking { get; set; }
