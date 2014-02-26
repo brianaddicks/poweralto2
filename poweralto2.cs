@@ -443,6 +443,14 @@ namespace PowerAlto {
 					ThisProfileSetting.Element("profiles").Add(FileBlockingProfileXml);
 				}
 				
+				// Set Data Filtering Profile
+				if (!(String.IsNullOrEmpty(this.DataFilteringProfile))) {
+					XElement DataFilteringProfileXml = new XElement("data-filtering",
+						new XElement("member",this.DataFilteringProfile)
+					);
+					ThisProfileSetting.Element("profiles").Add(DataFilteringProfileXml);
+				}
+				
 				XmlObject.Element("fakeroot").Add(ThisProfileSetting);
 			}
 			
@@ -455,10 +463,6 @@ namespace PowerAlto {
 /*
 public string Name { get; set; }
 
-		public string UrlFilteringProfile { get; set; }
-		publsic string FileBlockingProfile { get; set; }
-		public string DataFilteringProfile { get; set; }
-		
 		public bool LogAtSessionStart { get; set; }
 		public bool LogAtSessionEnd { get; set; }
 		public string LogForwarding { get; set; }
