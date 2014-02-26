@@ -185,7 +185,6 @@ namespace PowerAlto {
 			}
 			
 			// Set Source Zones
-			
 			XElement ThisSourceZones = new XElement("from");
 			
 			if (this.SourceZone != null) {			
@@ -203,7 +202,6 @@ namespace PowerAlto {
 			XmlObject.Element("fakeroot").Add(ThisSourceZones);
 			
 			// Set Source Addresses
-			
 			XElement ThisSourceAddresses = new XElement("source");
 			
 			if (this.SourceAddress != null) {			
@@ -221,7 +219,6 @@ namespace PowerAlto {
 			XmlObject.Element("fakeroot").Add(ThisSourceAddresses);
 			
 			// Set Source Negate
-			
 			if (this.SourceNegate) {
 				XElement ThisSourceNegate = new XElement("negate-source","yes");
 				XmlObject.Element("fakeroot").Add(ThisSourceNegate);
@@ -231,7 +228,6 @@ namespace PowerAlto {
 			}
 			
 			// Set Source User
-			
 			XElement ThisSourceUsers = new XElement("source-user");
 			
 			if (this.SourceUser != null) {			
@@ -249,7 +245,6 @@ namespace PowerAlto {
 			XmlObject.Element("fakeroot").Add(ThisSourceUsers);
 			
 			// Set Hip Profile
-			
 			XElement ThisHipProfiles = new XElement("hip-profiles");
 			
 			if (this.HipProfile != null) {			
@@ -266,8 +261,7 @@ namespace PowerAlto {
 			
 			XmlObject.Element("fakeroot").Add(ThisHipProfiles);
 			
-						// Set Destination Zones
-			
+			// Set Destination Zones
 			XElement ThisDestinationZones = new XElement("to");
 			
 			if (this.DestinationZone != null) {			
@@ -285,7 +279,6 @@ namespace PowerAlto {
 			XmlObject.Element("fakeroot").Add(ThisDestinationZones);
 			
 			// Set Destination Addresses
-			
 			XElement ThisDestinationAddresses = new XElement("destination");
 			
 			if (this.DestinationAddress != null) {			
@@ -303,7 +296,6 @@ namespace PowerAlto {
 			XmlObject.Element("fakeroot").Add(ThisDestinationAddresses);
 			
 			// Set Destination Negate
-			
 			if (this.DestinationNegate) {
 				XElement ThisDestinationNegate = new XElement("negate-destination","yes");
 				XmlObject.Element("fakeroot").Add(ThisDestinationNegate);
@@ -312,8 +304,7 @@ namespace PowerAlto {
 				XmlObject.Element("fakeroot").Add(ThisDestinationNegate);
 			}
 			
-			// Set Destination Addresses
-			
+			// Set Application
 			XElement ThisApplications = new XElement("application");
 			
 			if (this.Application != null) {			
@@ -330,6 +321,23 @@ namespace PowerAlto {
 			
 			XmlObject.Element("fakeroot").Add(ThisApplications);
 			
+			// Set Url Category
+			XElement ThisUrlCategorys = new XElement("category");
+			
+			if (this.UrlCategory != null) {			
+				foreach (string ThisUrlCategory in this.UrlCategory) {
+					ThisUrlCategorys.Add(
+						new XElement("member",ThisUrlCategory)
+					);
+				}
+			} else {
+				ThisUrlCategorys.Add(
+					new XElement("member","any")
+				);
+			}
+			
+			XmlObject.Element("fakeroot").Add(ThisUrlCategorys);
+			
 			// return beautiful, well-formatted xml
 			return XmlObject.Element("fakeroot").ToString();
 	    }
@@ -337,10 +345,7 @@ namespace PowerAlto {
 }
 
 /*
-public string Name { get; set; }
-		
-		public List<string> Application { get; set; }
-		
+public string Name { get; set; }		
 		public List<string> Service { get; set; }
 		public List<string> UrlCategory { get; set; }
 		
