@@ -120,8 +120,7 @@ namespace PowerAlto {
 	}
 	
 	public class SecurityRule {
-		private bool IsGroup = false;
-		
+	
 		public string Name { get; set; }
 		public string Description { get; set; }
 		public List<string> Tags { get; set; }
@@ -144,32 +143,47 @@ namespace PowerAlto {
 		
 		public bool Allow { get; set; } //true = allow, false = deny
 		
+		//private bool IsGroup = false;
+		private bool ProfileExists = false;
+		
 		private string profilegroup;
 		public string ProfileGroup {
 			get {
 				return this.profilegroup;
 			}
 			set {
-				this.profilegroup = value;
-				this.IsGroup = true;
+				if (this.ProfileExists) {
+					throw new System.ArgumentException("Profile Group cannot be set with individual profiles");
+				} else {
+					this.profilegroup = value;
+				}
 			}
 		}
-		/*
+		
+		
+		private string antivirusprofile;
 		public string AntivirusProfile {
 			get {
-				return this.AntivirusProfile;
+				return this.antivirusprofile;
 			}
 			set {
-				this.AntivirusProfile = value;
-				this.IsGroup = false;
+				this.antivirusprofile = value;
+				this.ProfileExists = true;
 			}
 		}
-		*/
 		
-		//public string ProfileGroup { get; set; }
-		public string AntivirusProfile { get; set; }
+		//public string VulnerabilityProfile { get; set; }
+		private string vulnerabilityprofile;
+		public string VulnerabilityProfile {
+			get {
+				return this.vulnerabilityprofile;
+			}
+			set {
+				this.vulnerabilityprofile = value;
+				this.ProfileExists = true;
+			}
+		}
 		
-		public string VulnerabilityProfile { get; set; }
 		public string AntiSpywareProfile { get; set; }
 		public string UrlFilteringProfile { get; set; }
 		public string FileBlockingProfile { get; set; }
@@ -383,8 +397,25 @@ namespace PowerAlto {
 			}
 			
 			// Set Individual Profiles
-			if (!this.IsGroup) {
-				XElement ThisProfileSetting = new XElement("profile-setting");
+			if (this.ProfileExists) {
+				
+				XElement ThisProfileSetting = new XElement("profile-setting",
+					new XElement("profiles")
+				);
+				
+				// Set Antivirus Profile
+				if (!(String.IsNullOrEmpty(this.AntivirusProfile))) {
+					XElement AntivirusProfileXml = new XElement("virus",
+						new XElement("member",this.AntivirusProfile)
+					);
+					ThisProfileSetting.Element("profiles").Add(AntivirusProfileXml);
+				}
+				
+				
+				
+				
+				
+				XmlObject.Element("fakeroot").Add(ThisProfileSetting);
 			}
 			
 			// return beautiful, well-formatted xml
