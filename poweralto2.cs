@@ -454,6 +454,25 @@ namespace PowerAlto {
 				XmlObject.Element("fakeroot").Add(ThisProfileSetting);
 			}
 			
+			// Set Log At Start
+			if (this.LogAtSessionStart) {
+				XElement LogAtSessionStartXml = new XElement("log-start","yes");
+				XmlObject.Element("fakeroot").Add(LogAtSessionStartXml);
+			} else {
+				XElement LogAtSessionStartXml = new XElement("log-start","no");
+				XmlObject.Element("fakeroot").Add(LogAtSessionStartXml);
+			}
+			
+			// Set Log At End
+			if (this.LogAtSessionEnd) {
+				XElement LogAtSessionEndXml = new XElement("log-end","yes");
+				XmlObject.Element("fakeroot").Add(LogAtSessionEndXml);
+			} else {
+				XElement LogAtSessionEndXml = new XElement("log-end","no");
+				XmlObject.Element("fakeroot").Add(LogAtSessionEndXml);
+			}
+			
+			
 			// return beautiful, well-formatted xml
 			return XmlObject.Element("fakeroot").ToString();
 	    }
@@ -472,3 +491,13 @@ public string Name { get; set; }
 		
 		public bool DisableSRI { get; set; }
 */
+
+
+
+
+
+
+
+
+
+
