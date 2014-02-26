@@ -338,6 +338,26 @@ namespace PowerAlto {
 			
 			XmlObject.Element("fakeroot").Add(ThisUrlCategorys);
 			
+			// Set Action
+			if (this.Allow) {
+				XElement ThisAllow = new XElement("action","allow");
+				XmlObject.Element("fakeroot").Add(ThisAllow);
+			} else {
+				XElement ThisAllow = new XElement("action","deny");
+				XmlObject.Element("fakeroot").Add(ThisAllow);
+			}
+			
+			// Set Profile Group
+			if (!(String.IsNullOrEmpty(this.ProfileGroup))) {
+				XElement ThisProfileGroup = new XElement("profile-setting");
+				ThisProfileGroup.Add(
+					new XElement("group",
+						new XElement("member",this.ProfileGroup)
+					)
+				);
+				XmlObject.Element("fakeroot").Add(ThisProfileGroup);
+			}
+			
 			// return beautiful, well-formatted xml
 			return XmlObject.Element("fakeroot").ToString();
 	    }
@@ -346,10 +366,6 @@ namespace PowerAlto {
 
 /*
 public string Name { get; set; }		
-		public List<string> Service { get; set; }
-		public List<string> UrlCategory { get; set; }
-		
-		public bool Allow { get; set; } //true = allow, false = deny
 		
 		public string ProfileGroup { get; set; }
 		
