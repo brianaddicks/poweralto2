@@ -220,9 +220,19 @@ namespace PowerAlto {
 			
 			XmlObject.Element("fakeroot").Add(ThisSourceAddresses);
 			
+			// Set Source Negate
+			
+			if (this.SourceNegate) {
+				XElement ThisSourceNegate = new XElement("negate-source","yes");
+			} else {
+				XElement ThisSourceNegate = new XElement("negate-source","no");
+			}
+			
+			XmlObject.Element("fakeroot").Add(ThisSourceNegate);
 			
 			// return beautiful, well-formatted xml
 			return XmlObject.Element("fakeroot").ToString();
+			
 	    }
 	}
 }
