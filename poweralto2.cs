@@ -411,8 +411,21 @@ namespace PowerAlto {
 					ThisProfileSetting.Element("profiles").Add(AntivirusProfileXml);
 				}
 				
+				// Set Vulnerability Profile
+				if (!(String.IsNullOrEmpty(this.VulnerabilityProfile))) {
+					XElement VulnerabilityProfileXml = new XElement("vulnerability",
+						new XElement("member",this.VulnerabilityProfile)
+					);
+					ThisProfileSetting.Element("profiles").Add(VulnerabilityProfileXml);
+				}
 				
-				
+				// Set AntiSpyware Profile
+				if (!(String.IsNullOrEmpty(this.AntiSpywareProfile))) {
+					XElement AntiSpywareProfileXml = new XElement("spyware",
+						new XElement("member",this.AntiSpywareProfile)
+					);
+					ThisProfileSetting.Element("profiles").Add(AntiSpywareProfileXml);
+				}
 				
 				
 				XmlObject.Element("fakeroot").Add(ThisProfileSetting);
