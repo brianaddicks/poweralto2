@@ -540,7 +540,9 @@ namespace PowerAlto {
 		}
 		public string PrintCliOutput () {
 			List<string> CliList = new List<string>();
-			return CliList;
+			
+			string CliString = string.Join("",CliList.ToArray());
+			return CliString;
 		}
 	}
 }
