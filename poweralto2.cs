@@ -628,6 +628,19 @@ namespace PowerAlto {
 				CliList.Add(" to any");
 			}
 			
+			// Destination Addresses
+			if (this.DestinationAddress != null) {
+				CliList.Add(" destination [");
+				foreach (string singleDestinationAddress in this.DestinationAddress) {
+					CliList.Add(" ");
+					CliList.Add(singleDestinationAddress);
+				}
+				CliList.Add(" ]");
+			} else {
+				CliList.Add(" destination any");
+			}
+			
+			
 			
 			
 			
