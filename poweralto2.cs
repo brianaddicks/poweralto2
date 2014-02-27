@@ -553,134 +553,50 @@ namespace PowerAlto {
 			}
 			
 			// Tags
-			if (this.Tags != null) {
-				CliList.Add(" tag [");
-				foreach (string singleTag in this.Tags) {
-					CliList.Add(" ");
-					CliList.Add(singleTag);
-				}
-				CliList.Add(" ]");
-			}
-			
-			// Source Zones
-			if (this.SourceZone != null) {
-				CliList.Add(" from [");
-				foreach (string singleSourceZone in this.SourceZone) {
-					CliList.Add(" ");
-					CliList.Add(singleSourceZone);
-				}
-				CliList.Add(" ]");
-			} else {
-				CliList.Add(" from any");
-			}
-			
-			// Source Addresses
-			if (this.SourceAddress != null) {			
-				CliList.Add(" source [");
-				foreach (string singleSourceAddress in this.SourceAddress) {
-					CliList.Add(" ");
-					CliList.Add(singleSourceAddress);
-				}
-				CliList.Add(" ]");
-			} else {
-				CliList.Add(" source any");
-			}
-			
-			// Source Negate
-			if (this.SourceNegate) {
-				CliList.Add(" negate-source yes");
-			} else {
-				CliList.Add(" negate-source no");
-			}
-			
-			// Source User
-			if (this.SourceUser != null) {
-				CliList.Add(" source-user [");
-				foreach (string singleSourceUser in this.SourceUser) {
-					CliList.Add(" ");
-					CliList.Add(singleSourceUser);
-				}
-				CliList.Add(" ]");
-			} else {
-				CliList.Add(" source-user any");
-			}
-			
-			// Hip Profiles
-			if (this.HipProfile != null) {
-				CliList.Add(" hip-profiles [");
-				foreach (string singleHipProfile in this.HipProfile) {
-					CliList.Add(" ");
-					CliList.Add(singleHipProfile);
-				}
-				CliList.Add(" ]");
-			} else {
-				CliList.Add(" hip-profiles any");
-			}
-			
-			// Destination Zones
-			if (this.DestinationZone != null) {
-				CliList.Add(" to [");
-				foreach (string singleDestinationZone in this.DestinationZone) {
-					CliList.Add(" ");
-					CliList.Add(singleDestinationZone);
-				}
-				CliList.Add(" ]");
-			} else {
-				CliList.Add(" to any");
-			}
-			
-			// Destination Addresses
-			CliList.Add(createCliWithMembers( "destination", this.DestinationAddress ));
-			
-			/*
-			if (this.DestinationAddress != null) {
-				CliList.Add(" destination [");
-				foreach (string singleDestinationAddress in this.DestinationAddress) {
-					CliList.Add(" ");
-					CliList.Add(singleDestinationAddress);
-				}
-				CliList.Add(" ]");
-			} else {
-				CliList.Add(" destination any");
-			}
-			*/
-			
-			// Destination Negate
-			if (this.DestinationNegate) {
-				CliList.Add(" negate-destination yes");
-			} else {
-				CliList.Add(" negate-destination no");
-			}
-			
-			CliList.Add(createCliWithMembers( "application", this.Application ));
+			CliList.Add(createCliWithMembers( "tag", this.Tags ));
 			
 			
 			
 			
 			
-			string CliString = string.Join("",CliList.ToArray());
-			return CliString;
-		}
-		
-		private string createCliWithMembers( string CliKeyword, List<string> RuleProperty = null) {
-			string CliObject = "";
-			if (RuleProperty != null) {
-				CliObject += " " + CliKeyword + " [";
-				foreach (string r in RuleProperty) {
-					CliObject += " " + r;
-				}
-				CliObject += " ]";
-			} else {
-				CliObject += " " + CliKeyword + " any";
-			}
-			return CliObject;
-		}
-	}
-}
+			
+			// --------------------------- Users and Hip Profiles --------------------------- //
+			CliList.Add(createReqCliWithMembers( "source-user", this.SourceUser ));           // Source User
+			CliList.Add(createReqCliWithMembers( "hip-profiles", this.HipProfile ));          // Hip Profiles
+			// ------------------------------------------------------------------------------ //
 
+
+			// ------------------------------ Address Negation ------------------------------ //
+			CliList.Add(createCliBool( "negate-source", this.SourceNegate));				  // Source Negate
+			CliList.Add(createCliBool( "negate-destination", this.DestinationNegate));		  // Destination Negate
+			// ------------------------------------------------------------------------------ //
+
+
+			// ----------------------------------- Zones ------------------------------------ //
+			CliList.Add(createReqCliWithMembers( "from", this.SourceZone ));				  // Source Zones
+			CliList.Add(createReqCliWithMembers( "to", this.DestinationZone ));				  // Destination Zones
+			// ------------------------------------------------------------------------------ //
+
+
+			// ----------------------------------- Zones ------------------------------------ //
+			CliList.Add(createReqCliWithMembers( "source", this.SourceAddress ));			  // Source Addresses
+			CliList.Add(createReqCliWithMembers( "destination", this.DestinationAddress ));	  // Destination Addresses
+			// ------------------------------------------------------------------------------ //
+
+
+			// ------------------ Applications, Services, and URL Category ------------------ //
+			CliList.Add(createReqCliWithMembers( "application", this.Application ));          // Applications
+			CliList.Add(createReqCliWithMembers( "service", this.Service ));                  // Services
+			CliList.Add(createReqCliWithMembers( "category", this.UrlCategory ));             // Url Category
+			// ------------------------------------------------------------------------------ //
+
+			// -------------------------- Action and Log Settings --------------------------- //
+			if (this.Allow) { CliList.Add(" action allow");	}                                 // Allow
+			           else { CliList.Add(" action deny");  }                                 // Deny
+			// ------------------------------------------------------------------------------ //
+			
+			
 /*
-		public List<string> Service { get; set; }
-		public List<string> UrlCategory { get; set; }
 		
 		public bool Allow { get; set; } //true = allow, false = deny
 		
@@ -739,7 +655,52 @@ namespace PowerAlto {
 		public string QosMarking { get; set; }
 		
 		public bool DisableSRI { get; set; }
-*/
+*/			
+			
+			
+			string CliString = string.Join("",CliList.ToArray());
+			return CliString;
+		}
+		
+		private string createReqCliWithMembers( string CliKeyword, List<string> RuleProperty = null) {
+			string CliObject = "";
+			if (RuleProperty != null) {
+				CliObject += " " + CliKeyword + " [";
+				foreach (string r in RuleProperty) {
+					CliObject += " " + r;
+				}
+				CliObject += " ]";
+			} else {
+				CliObject += " " + CliKeyword + " any";
+			}
+			return CliObject;
+		}
+
+		private string createCliWithMembers( string CliKeyword, List<string> RuleProperty = null) {
+			string CliObject = "";
+			if (RuleProperty != null) {
+				CliObject += " " + CliKeyword + " [";
+				foreach (string r in RuleProperty) {
+					CliObject += " " + r;
+				}
+				CliObject += " ]";
+			}
+			return CliObject;
+		}
+
+		private string createCliBool( string CliKeyword, bool RuleProperty ) {
+			string CliObject = "";
+			if (RuleProperty) {
+				CliObject += " " + CliKeyword + " yes";
+			} else {
+				CliObject += " " + CliKeyword + " no";
+			}
+			return CliObject;
+		}
+	}
+}
+
+
 
 
 
