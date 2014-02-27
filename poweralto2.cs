@@ -590,57 +590,41 @@ namespace PowerAlto {
 			CliList.Add(createReqCliWithMembers( "category", this.UrlCategory ));             // Url Category
 			// ------------------------------------------------------------------------------ //
 
-			// -------------------------- Action and Log Settings --------------------------- //
+			// ----------------------------------- Action ----------------------------------- //
 			if (this.Allow) { CliList.Add(" action allow");	}                                 // Allow
 			           else { CliList.Add(" action deny");  }                                 // Deny
 			// ------------------------------------------------------------------------------ //
+
 			
+			// ------------------------------ Security Profiles ----------------------------- //
+			if (this.ProfileExists) {
+				CliList.Add(" profile-setting profiles");
+				CliList.Add(createCliWithoutMembers( "virus", this.AntivirusProfile ));
+				CliList.Add(createCliWithoutMembers( "spyware", this.AntiSpywareProfile ));
+				CliList.Add(createCliWithoutMembers( "vulnerability", this.VulnerabilityProfile ));
+				CliList.Add(createCliWithoutMembers( "url-filtering", this.UrlFilteringProfile ));
+				CliList.Add(createCliWithoutMembers( "file-blocking", this.FileBlockingProfile ));
+				CliList.Add(createCliWithoutMembers( "data-filtering", this.DataFilteringProfile ));
+			}
+
+			if (!(String.IsNullOrEmpty(this.ProfileGroup))) {
+				CliList.Add(" profile-settings profiles ");
+				CliList.Add(this.ProfileGroup);
+			}			
+			// ------------------------------------------------------------------------------ //
+
+
+			// profile-setting profiles data-filtering test
 			
 /*
-		
-		public bool Allow { get; set; } //true = allow, false = deny
-		
-		//private bool IsGroup = false;
-		private bool ProfileExists = false;
-		
 		private string profilegroup;
 		public string ProfileGroup {
-			get {
-				return this.profilegroup;
-			}
-			set {
-				if (this.ProfileExists) {
-					throw new System.ArgumentException("Profile Group cannot be set with individual profiles");
-				} else {
-					this.profilegroup = value;
-				}
-			}
-		}
-		
-		
+
 		private string antivirusprofile;
 		public string AntivirusProfile {
-			get {
-				return this.antivirusprofile;
-			}
-			set {
-				this.antivirusprofile = value;
-				this.ProfileExists = true;
-			}
-		}
-		
 		//public string VulnerabilityProfile { get; set; }
 		private string vulnerabilityprofile;
 		public string VulnerabilityProfile {
-			get {
-				return this.vulnerabilityprofile;
-			}
-			set {
-				this.vulnerabilityprofile = value;
-				this.ProfileExists = true;
-			}
-		}
-		
 		public string AntiSpywareProfile { get; set; }
 		public string UrlFilteringProfile { get; set; }
 		public string FileBlockingProfile { get; set; }
@@ -658,10 +642,18 @@ namespace PowerAlto {
 */			
 			
 			
-			string CliString = string.Join("",CliList.ToArray());
+			string CliString = string.Join("",CliList.ToArray());  // Smash it all together
 			return CliString;
 		}
 		
+		private string createCliWithoutMembers( string CliKeyword, string RuleProperty) {
+			string CliObject = "";
+			if (RuleProperty != null) {
+				CliObject += " " + CliKeyword + " " + RuleProperty;
+			}
+			return CliObject;
+		}
+
 		private string createReqCliWithMembers( string CliKeyword, List<string> RuleProperty = null) {
 			string CliObject = "";
 			if (RuleProperty != null) {
