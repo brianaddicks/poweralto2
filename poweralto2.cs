@@ -640,6 +640,12 @@ namespace PowerAlto {
 				CliList.Add(" destination any");
 			}
 			
+			//Destination Negate
+			if (this.DestinationNegate) {
+				CliList.Add(" negate-destination yes");
+			} else {
+				CliList.Add(" negate-destination no");
+			}
 			
 			
 			
