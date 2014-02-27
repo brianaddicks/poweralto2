@@ -608,28 +608,21 @@ namespace PowerAlto {
 			}
 
 			if (!(String.IsNullOrEmpty(this.ProfileGroup))) {
-				CliList.Add(" profile-settings profiles ");
+				CliList.Add(" profile-settings group ");
 				CliList.Add(this.ProfileGroup);
 			}			
 			// ------------------------------------------------------------------------------ //
 
 
-			// profile-setting profiles data-filtering test
+			// -------------------------------- Log Settings -------------------------------- //
+			CliList.Add(createCliBool( "log-start", this.LogAtSessionStart));				  // Log At Start
+			CliList.Add(createCliBool( "log-end", this.LogAtSessionEnd));					  // Log At End
+			CliList.Add(createCliWithoutMembers( "log-setting", this.LogForwarding));		  // Log Forwarding
+
+
+
 			
 /*
-		private string profilegroup;
-		public string ProfileGroup {
-
-		private string antivirusprofile;
-		public string AntivirusProfile {
-		//public string VulnerabilityProfile { get; set; }
-		private string vulnerabilityprofile;
-		public string VulnerabilityProfile {
-		public string AntiSpywareProfile { get; set; }
-		public string UrlFilteringProfile { get; set; }
-		public string FileBlockingProfile { get; set; }
-		public string DataFilteringProfile { get; set; }
-		
 		public bool LogAtSessionStart { get; set; }
 		public bool LogAtSessionEnd { get; set; }
 		public string LogForwarding { get; set; }
