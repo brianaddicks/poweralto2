@@ -585,6 +585,25 @@ namespace PowerAlto {
 				CliList.Add(" source any");
 			}
 			
+			// Set Source Negate
+			if (this.SourceNegate) {
+				CliList.Add(" negate-source yes");
+			} else {
+				CliList.Add(" negate-source no");
+			}
+			
+			// Set Source User
+			if (this.SourceUser != null) {
+				CliList.Add(" source-user [");
+				foreach (string singleSourceUser in this.SourceUser) {
+					CliList.Add(" ");
+					CliList.Add(singleSourceUser);
+				}
+				CliList.Add(" ]");
+			} else {
+				CliList.Add(" source-user any");
+			}
+			
 			
 			
 			string CliString = string.Join("",CliList.ToArray());
@@ -594,9 +613,6 @@ namespace PowerAlto {
 }
 
 /*
-		public List<string> SourceAddress { get; set; }
-		public bool SourceNegate { get; set; }
-		
 		public List<string> SourceUser { get; set; }
 		public List<string> HipProfile { get; set; }
 		
