@@ -74,11 +74,13 @@ namespace PowerAlto {
 
                 return queryString.ToString();
             }
-
         }
 
         protected override void EndProcessing() {
-            string url = FirewallObject.UrlBuilder( QueryString );
+            string Url = FirewallObject.UrlBuilder( QueryString );
+            HttpQueryReturnObject QueryObject = FirewallObject.HttpQuery( Url );
+
+            XmlDocument Data = QueryObject.Data;
 
             WriteObject( FirewallObject, true );
         }
