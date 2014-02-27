@@ -655,6 +655,7 @@ namespace PowerAlto {
 					CliList.Add(" ");
 					CliList.Add(singleApplication);
 				}
+				CliList.Add(" ]");
 			} else {
 				CliList.Add(" application any");
 			}
