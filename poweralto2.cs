@@ -33,6 +33,7 @@ namespace PowerAlto {
 		public string ThreatVersion { get; set; }
 		public string WildFireVersion { get; set; }
 		public string UrlVersion { get; set; }
+		public XmlDocument LastXmlResult { get; set; }
 		
 		public string ApiUrl {
 			get {
@@ -117,6 +118,10 @@ namespace PowerAlto {
 			ServicePointManager.Expect100Continue = true;
 			ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3;
 		}
+		
+		//Holds the raw result of the last query
+		//Would like to convert this to emulate UrlHistory, but I think we need to get the HttpQuery helper as a method to PaDevice first
+		
 	}
 	
 	public class SecurityRule {
@@ -198,6 +203,9 @@ namespace PowerAlto {
 		public string QosMarking { get; set; }
 		
 		public bool DisableSRI { get; set; }
+		
+		public string LastUncommitedChangeBy { get; set; }
+		public string LastUncommitedChangeTimestamp { get; set; }	// This should be a datetime object
 		
 		public XElement Xml () {
                     
@@ -396,7 +404,7 @@ namespace PowerAlto {
 				XElement ThisProfileGroup = new XElement("profile-setting");
 				ThisProfileGroup.Add(
 					new XElement("group",
-						new XElement("member",this.ProfileGroup)
+						new XElement("member",this.ProfileGroup)   // NEED TO ACCOUNT FOR GROUP NONE
 					)
 				);
 				XmlObject.Element("entry").Add(ThisProfileGroup);
@@ -530,9 +538,10 @@ namespace PowerAlto {
 		public string PrintPlainXml() {
 			return Xml().ToString(SaveOptions.DisableFormatting);
 		}
-		//public string PrintCliOutput () {
-			
-		//}
+		public string PrintCliOutput () {
+			List<string> CliList = new List<string>();
+			return CliList;
+		}
 	}
 }
 
