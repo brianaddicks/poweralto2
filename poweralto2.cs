@@ -538,6 +538,7 @@ namespace PowerAlto {
 		public string PrintPlainXml() {
 			return Xml().ToString(SaveOptions.DisableFormatting);
 		}
+		
 		public string PrintCliOutput () {
 			List<string> CliList = new List<string>();
 			
@@ -640,12 +641,25 @@ namespace PowerAlto {
 				CliList.Add(" destination any");
 			}
 			
-			//Destination Negate
+			// Destination Negate
 			if (this.DestinationNegate) {
 				CliList.Add(" negate-destination yes");
 			} else {
 				CliList.Add(" negate-destination no");
 			}
+			
+			// Applications
+			if (this.Application != null) {
+				CliList.Add(" application [");
+				foreach (string singleApplication in this.Application) {
+					CliList.Add(" ");
+					CliList.Add(singleApplication);
+				}
+			} else {
+				CliList.Add(" application any");
+			}
+			
+			
 			
 			
 			
@@ -657,15 +671,6 @@ namespace PowerAlto {
 }
 
 /*
-		public List<string> SourceUser { get; set; }
-		public List<string> HipProfile { get; set; }
-		
-		public List<string> DestinationZone { get; set; }
-		public List<string> DestinationAddress { get; set; }
-		public bool DestinationNegate { get; set; }
-		
-		public List<string> Application { get; set; }
-		
 		public List<string> Service { get; set; }
 		public List<string> UrlCategory { get; set; }
 		
