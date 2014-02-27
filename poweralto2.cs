@@ -485,6 +485,7 @@ namespace PowerAlto {
 				XmlObject.Element("fakeroot").Add(ScheduleXml);
 			}
 			
+			// Set Qos Marking
 			if (!(String.IsNullOrEmpty(this.QosMarking)) && !(String.IsNullOrEmpty(this.QosType))) {
 				XElement QosXml = new XElement("qos",
 					new XElement("marking")
@@ -501,18 +502,24 @@ namespace PowerAlto {
 				XmlObject.Element("fakeroot").Add(QosXml);
 			}
 			
+			// Set Disable Server Response Inspection
+			if (this.DisableSRI) {
+				XElement DisableSRIXml = new XElement("option",
+					new XElement("disable-server-response-inspection","yes")
+				);
+				XmlObject.Element("fakeroot").Add(DisableSRIXml);
+			} else {
+				XElement DisableSRIXml = new XElement("option",
+					new XElement("disable-server-response-inspection","no")
+				);
+				XmlObject.Element("fakeroot").Add(DisableSRIXml);
+			}
 			
 			// return beautiful, well-formatted xml
 			return XmlObject.Element("fakeroot").ToString();
 	    }
 	}
 }
-
-/*
-public string Name { get; set; }
-		
-		public bool DisableSRI { get; set; }
-*/
 
 
 
