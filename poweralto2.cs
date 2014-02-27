@@ -630,6 +630,9 @@ namespace PowerAlto {
 			}
 			
 			// Destination Addresses
+			CliList.Add(createCliWithMembers( "destination", this.DestinationAddress ));
+			
+			/*
 			if (this.DestinationAddress != null) {
 				CliList.Add(" destination [");
 				foreach (string singleDestinationAddress in this.DestinationAddress) {
@@ -640,6 +643,7 @@ namespace PowerAlto {
 			} else {
 				CliList.Add(" destination any");
 			}
+			*/
 			
 			// Destination Negate
 			if (this.DestinationNegate) {
@@ -648,18 +652,7 @@ namespace PowerAlto {
 				CliList.Add(" negate-destination no");
 			}
 			
-			// Applications
-			if (this.Application != null) {
-				CliList.Add(" application [");
-				foreach (string singleApplication in this.Application) {
-					CliList.Add(" ");
-					CliList.Add(singleApplication);
-				}
-				CliList.Add(" ]");
-			} else {
-				CliList.Add(" application any");
-			}
-			
+			CliList.Add(createCliWithMembers( "application", this.Application ));
 			
 			
 			
@@ -667,6 +660,20 @@ namespace PowerAlto {
 			
 			string CliString = string.Join("",CliList.ToArray());
 			return CliString;
+		}
+		
+		private string createCliWithMembers( string CliKeyword, List<string> RuleProperty = null) {
+			string CliObject = "";
+			if (RuleProperty != null) {
+				CliObject += " " + CliKeyword + " [";
+				foreach (string r in RuleProperty) {
+					CliObject += " " + r;
+				}
+				CliObject += " ]";
+			} else {
+				CliObject += " " + CliKeyword + " any";
+			}
+			return CliObject;
 		}
 	}
 }
