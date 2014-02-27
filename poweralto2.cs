@@ -616,6 +616,19 @@ namespace PowerAlto {
 				CliList.Add(" hip-profiles any");
 			}
 			
+			// Destination Zones
+			if (this.DestinationZone != null) {
+				CliList.Add(" to [");
+				foreach (string singleDestinationZone in this.DestinationZone) {
+					CliList.Add(" ");
+					CliList.Add(singleDestinationZone);
+				}
+				CliList.Add(" ]");
+			} else {
+				CliList.Add(" to any");
+			}
+			
+			
 			
 			
 			string CliString = string.Join("",CliList.ToArray());
