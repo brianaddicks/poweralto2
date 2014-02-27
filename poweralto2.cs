@@ -199,16 +199,21 @@ namespace PowerAlto {
 		
 		public bool DisableSRI { get; set; }
 		
-		public string PrintOutput () {
+		public XElement Xml () {
                     
 			// Create root, this will be stripped off, but is required to use the builtin xml functions
 			XDocument XmlObject = new XDocument(
-				new XElement("fakeroot")
+				//new XElement("entry")
 			);
+			
+			XElement EntryXml = new XElement("entry");
+			EntryXml.SetAttributeValue("name",this.Name);
+			XmlObject.Add(EntryXml);
+			//XmlObject.Element("entry").SetAttributeValue("name",this.Name);
 			
 			if (!(String.IsNullOrEmpty(this.Description))) {
 				XElement ThisDescription = new XElement("description",this.Description);
-				XmlObject.Element("fakeroot").Add(ThisDescription);
+				XmlObject.Element("entry").Add(ThisDescription);
 			}
 			
 			// Set Tags
@@ -220,7 +225,7 @@ namespace PowerAlto {
 						new XElement("member",ThisTag)
 					);
 				}
-				XmlObject.Element("fakeroot").Add(ThisTags);
+				XmlObject.Element("entry").Add(ThisTags);
 			}
 			
 			// Set Source Zones
@@ -238,7 +243,7 @@ namespace PowerAlto {
 				);
 			}
 			
-			XmlObject.Element("fakeroot").Add(ThisSourceZones);
+			XmlObject.Element("entry").Add(ThisSourceZones);
 			
 			// Set Source Addresses
 			XElement ThisSourceAddresses = new XElement("source");
@@ -255,15 +260,15 @@ namespace PowerAlto {
 				);
 			}
 			
-			XmlObject.Element("fakeroot").Add(ThisSourceAddresses);
+			XmlObject.Element("entry").Add(ThisSourceAddresses);
 			
 			// Set Source Negate
 			if (this.SourceNegate) {
 				XElement ThisSourceNegate = new XElement("negate-source","yes");
-				XmlObject.Element("fakeroot").Add(ThisSourceNegate);
+				XmlObject.Element("entry").Add(ThisSourceNegate);
 			} else {
 				XElement ThisSourceNegate = new XElement("negate-source","no");
-				XmlObject.Element("fakeroot").Add(ThisSourceNegate);
+				XmlObject.Element("entry").Add(ThisSourceNegate);
 			}
 			
 			// Set Source User
@@ -281,7 +286,7 @@ namespace PowerAlto {
 				);
 			}
 			
-			XmlObject.Element("fakeroot").Add(ThisSourceUsers);
+			XmlObject.Element("entry").Add(ThisSourceUsers);
 			
 			// Set Hip Profile
 			XElement ThisHipProfiles = new XElement("hip-profiles");
@@ -298,7 +303,7 @@ namespace PowerAlto {
 				);
 			}
 			
-			XmlObject.Element("fakeroot").Add(ThisHipProfiles);
+			XmlObject.Element("entry").Add(ThisHipProfiles);
 			
 			// Set Destination Zones
 			XElement ThisDestinationZones = new XElement("to");
@@ -315,7 +320,7 @@ namespace PowerAlto {
 				);
 			}
 			
-			XmlObject.Element("fakeroot").Add(ThisDestinationZones);
+			XmlObject.Element("entry").Add(ThisDestinationZones);
 			
 			// Set Destination Addresses
 			XElement ThisDestinationAddresses = new XElement("destination");
@@ -332,15 +337,15 @@ namespace PowerAlto {
 				);
 			}
 			
-			XmlObject.Element("fakeroot").Add(ThisDestinationAddresses);
+			XmlObject.Element("entry").Add(ThisDestinationAddresses);
 			
 			// Set Destination Negate
 			if (this.DestinationNegate) {
 				XElement ThisDestinationNegate = new XElement("negate-destination","yes");
-				XmlObject.Element("fakeroot").Add(ThisDestinationNegate);
+				XmlObject.Element("entry").Add(ThisDestinationNegate);
 			} else {
 				XElement ThisDestinationNegate = new XElement("negate-destination","no");
-				XmlObject.Element("fakeroot").Add(ThisDestinationNegate);
+				XmlObject.Element("entry").Add(ThisDestinationNegate);
 			}
 			
 			// Set Application
@@ -358,7 +363,7 @@ namespace PowerAlto {
 				);
 			}
 			
-			XmlObject.Element("fakeroot").Add(ThisApplications);
+			XmlObject.Element("entry").Add(ThisApplications);
 			
 			// Set Url Category
 			XElement ThisUrlCategorys = new XElement("category");
@@ -375,15 +380,15 @@ namespace PowerAlto {
 				);
 			}
 			
-			XmlObject.Element("fakeroot").Add(ThisUrlCategorys);
+			XmlObject.Element("entry").Add(ThisUrlCategorys);
 			
 			// Set Action
 			if (this.Allow) {
 				XElement ThisAllow = new XElement("action","allow");
-				XmlObject.Element("fakeroot").Add(ThisAllow);
+				XmlObject.Element("entry").Add(ThisAllow);
 			} else {
 				XElement ThisAllow = new XElement("action","deny");
-				XmlObject.Element("fakeroot").Add(ThisAllow);
+				XmlObject.Element("entry").Add(ThisAllow);
 			}
 			
 			// Set Profile Group
@@ -394,7 +399,7 @@ namespace PowerAlto {
 						new XElement("member",this.ProfileGroup)
 					)
 				);
-				XmlObject.Element("fakeroot").Add(ThisProfileGroup);
+				XmlObject.Element("entry").Add(ThisProfileGroup);
 			}
 			
 			// Set Individual Profiles
@@ -452,37 +457,37 @@ namespace PowerAlto {
 					ThisProfileSetting.Element("profiles").Add(DataFilteringProfileXml);
 				}
 				
-				XmlObject.Element("fakeroot").Add(ThisProfileSetting);
+				XmlObject.Element("entry").Add(ThisProfileSetting);
 			}
 			
 			// Set Log At Start
 			if (this.LogAtSessionStart) {
 				XElement LogAtSessionStartXml = new XElement("log-start","yes");
-				XmlObject.Element("fakeroot").Add(LogAtSessionStartXml);
+				XmlObject.Element("entry").Add(LogAtSessionStartXml);
 			} else {
 				XElement LogAtSessionStartXml = new XElement("log-start","no");
-				XmlObject.Element("fakeroot").Add(LogAtSessionStartXml);
+				XmlObject.Element("entry").Add(LogAtSessionStartXml);
 			}
 			
 			// Set Log At End
 			if (this.LogAtSessionEnd) {
 				XElement LogAtSessionEndXml = new XElement("log-end","yes");
-				XmlObject.Element("fakeroot").Add(LogAtSessionEndXml);
+				XmlObject.Element("entry").Add(LogAtSessionEndXml);
 			} else {
 				XElement LogAtSessionEndXml = new XElement("log-end","no");
-				XmlObject.Element("fakeroot").Add(LogAtSessionEndXml);
+				XmlObject.Element("entry").Add(LogAtSessionEndXml);
 			}
 			
 			// Set Log Forwarding
 			if (!(String.IsNullOrEmpty(this.LogForwarding))) {
 				XElement LogForwardingXml = new XElement("log-setting",this.LogForwarding);
-				XmlObject.Element("fakeroot").Add(LogForwardingXml);
+				XmlObject.Element("entry").Add(LogForwardingXml);
 			}
 			
 			// Set Schedule
 			if (!(String.IsNullOrEmpty(this.Schedule))) {
 				XElement ScheduleXml = new XElement("schedule",this.Schedule);
-				XmlObject.Element("fakeroot").Add(ScheduleXml);
+				XmlObject.Element("entry").Add(ScheduleXml);
 			}
 			
 			// Set Qos Marking
@@ -499,7 +504,7 @@ namespace PowerAlto {
 					QosXml.Element("marking").Add(QosMarkingXml);
 				}
 				
-				XmlObject.Element("fakeroot").Add(QosXml);
+				XmlObject.Element("entry").Add(QosXml);
 			}
 			
 			// Set Disable Server Response Inspection
@@ -507,21 +512,109 @@ namespace PowerAlto {
 				XElement DisableSRIXml = new XElement("option",
 					new XElement("disable-server-response-inspection","yes")
 				);
-				XmlObject.Element("fakeroot").Add(DisableSRIXml);
+				XmlObject.Element("entry").Add(DisableSRIXml);
 			} else {
 				XElement DisableSRIXml = new XElement("option",
 					new XElement("disable-server-response-inspection","no")
 				);
-				XmlObject.Element("fakeroot").Add(DisableSRIXml);
+				XmlObject.Element("entry").Add(DisableSRIXml);
 			}
 			
-			// return beautiful, well-formatted xml
-			return XmlObject.Element("fakeroot").ToString();
+			return XmlObject.Element("entry");
 	    }
+
+		public string PrintPrettyXml() {
+			return Xml().ToString();
+		}
+		
+		public string PrintPlainXml() {
+			return Xml().ToString(SaveOptions.DisableFormatting);
+		}
+		//public string PrintCliOutput () {
+			
+		//}
 	}
 }
 
-
+/*
+public string Name { get; set; }
+		public string Description { get; set; }
+		public List<string> Tags { get; set; }
+		
+		public List<string> SourceZone { get; set; }
+		public List<string> SourceAddress { get; set; }
+		public bool SourceNegate { get; set; }
+		
+		public List<string> SourceUser { get; set; }
+		public List<string> HipProfile { get; set; }
+		
+		public List<string> DestinationZone { get; set; }
+		public List<string> DestinationAddress { get; set; }
+		public bool DestinationNegate { get; set; }
+		
+		public List<string> Application { get; set; }
+		
+		public List<string> Service { get; set; }
+		public List<string> UrlCategory { get; set; }
+		
+		public bool Allow { get; set; } //true = allow, false = deny
+		
+		//private bool IsGroup = false;
+		private bool ProfileExists = false;
+		
+		private string profilegroup;
+		public string ProfileGroup {
+			get {
+				return this.profilegroup;
+			}
+			set {
+				if (this.ProfileExists) {
+					throw new System.ArgumentException("Profile Group cannot be set with individual profiles");
+				} else {
+					this.profilegroup = value;
+				}
+			}
+		}
+		
+		
+		private string antivirusprofile;
+		public string AntivirusProfile {
+			get {
+				return this.antivirusprofile;
+			}
+			set {
+				this.antivirusprofile = value;
+				this.ProfileExists = true;
+			}
+		}
+		
+		//public string VulnerabilityProfile { get; set; }
+		private string vulnerabilityprofile;
+		public string VulnerabilityProfile {
+			get {
+				return this.vulnerabilityprofile;
+			}
+			set {
+				this.vulnerabilityprofile = value;
+				this.ProfileExists = true;
+			}
+		}
+		
+		public string AntiSpywareProfile { get; set; }
+		public string UrlFilteringProfile { get; set; }
+		public string FileBlockingProfile { get; set; }
+		public string DataFilteringProfile { get; set; }
+		
+		public bool LogAtSessionStart { get; set; }
+		public bool LogAtSessionEnd { get; set; }
+		public string LogForwarding { get; set; }
+		
+		public string Schedule { get; set; }
+		public string QosType { get; set; }
+		public string QosMarking { get; set; }
+		
+		public bool DisableSRI { get; set; }
+*/
 
 
 

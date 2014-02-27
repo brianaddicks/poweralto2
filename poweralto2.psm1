@@ -181,13 +181,46 @@ function Get-PaSecurityRule {
     if ($Candidate) { $Action = "get"  } `
                else { $Action = "show" }
     
-    return Get-PaConfig -Xpath $Xpath -Action $Action
+    $RuleData = Get-PaConfig -Xpath $Xpath -Action $Action
+
+    if ($RuleData.rules) { $RuleData = $RuleData.rules.entry } `
+                    else { $RuleData = $RuleData.entry       }
+        
+
+    $RuleTable = @()
+    foreach ($r in $RuleData) {
+        $RuleObject = New-Object PowerAlto.SecurityRule
+
+        $RuleObject.Name        = $r.Name
+        $RuleObject.Description = $r.Description
+
+    }
 
 }
 
 ###############################################################################
 ## Start Helper Functions
 ###############################################################################
+
+function HelperGetPropertyMembers {
+    Param (
+        [Parameter(Mandatory=$True,Position=0)]
+        [string]$XmlObject,
+
+        [Parameter(Mandatory=$True,Position=1)]
+        [string]$XmlProperty
+    )
+
+    $ReturnObject = @()
+    
+    if ($XmlObject.$XmlProperty) {
+        foreach ($x in $XmlObject.$XmlProperty.member) {
+        $ReturnObject += $x
+        }
+    }
+
+    return $ReturnObject
+}
 
 function HelperCheckPaConnection {
     if (!($Global:PaDeviceObject)) {
