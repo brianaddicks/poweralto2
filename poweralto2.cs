@@ -541,6 +541,52 @@ namespace PowerAlto {
 		public string PrintCliOutput () {
 			List<string> CliList = new List<string>();
 			
+			// Start command and add name
+			CliList.Add("set rulebase security rules ");
+			CliList.Add(this.Name);
+			
+			// Description
+			if (!(String.IsNullOrEmpty(this.Description))) {
+				CliList.Add(" description ");
+				CliList.Add(this.Description);
+			}
+			
+			// Tags
+			if (this.Tags != null) {
+				CliList.Add(" tag [");
+				foreach (string singleTag in this.Tags) {
+					CliList.Add(" ");
+					CliList.Add(singleTag);
+				}
+				CliList.Add(" ]");
+			}
+			
+			// Source Zones
+			if (this.SourceZone != null) {
+				CliList.Add(" from [");
+				foreach (string singleSourceZone in this.SourceZone) {
+					CliList.Add(" ");
+					CliList.Add(singleSourceZone);
+				}
+				CliList.Add(" ]");
+			} else {
+				CliList.Add(" from any");
+			}
+			
+			// Source Addresses
+			if (this.SourceAddress != null) {			
+				CliList.Add(" source [");
+				foreach (string singleSourceAddress in this.SourceAddress) {
+					CliList.Add(" ");
+					CliList.Add(singleSourceAddress);
+				}
+				CliList.Add(" ]");
+			} else {
+				CliList.Add(" source any");
+			}
+			
+			
+			
 			string CliString = string.Join("",CliList.ToArray());
 			return CliString;
 		}
@@ -548,11 +594,6 @@ namespace PowerAlto {
 }
 
 /*
-public string Name { get; set; }
-		public string Description { get; set; }
-		public List<string> Tags { get; set; }
-		
-		public List<string> SourceZone { get; set; }
 		public List<string> SourceAddress { get; set; }
 		public bool SourceNegate { get; set; }
 		
