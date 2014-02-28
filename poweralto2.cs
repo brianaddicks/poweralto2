@@ -618,15 +618,19 @@ namespace PowerAlto {
 			CliList.Add(createCliBool( "log-start", this.LogAtSessionStart));				  // Log At Start
 			CliList.Add(createCliBool( "log-end", this.LogAtSessionEnd));					  // Log At End
 			CliList.Add(createCliWithoutMembers( "log-setting", this.LogForwarding));		  // Log Forwarding
+			// ------------------------------------------------------------------------------ //
+
+
+			// ----------------------------- Schedule and DSRI ------------------------------ //
+			CliList.Add(createCliWithoutMembers( "schedule", this.Schedule));				  // Schedule
+			string cmdDisableSRI = "option disable-server-response-inspection";
+			CliList.Add(createCliBool( cmdDisableSRI, this.DisableSRI));					  // Disable SRI
+			// ------------------------------------------------------------------------------ //
 
 
 
 			
 /*
-		public bool LogAtSessionStart { get; set; }
-		public bool LogAtSessionEnd { get; set; }
-		public string LogForwarding { get; set; }
-		
 		public string Schedule { get; set; }
 		public string QosType { get; set; }
 		public string QosMarking { get; set; }
