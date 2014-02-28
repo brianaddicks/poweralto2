@@ -207,204 +207,157 @@ namespace PowerAlto {
 		public string LastUncommitedChangeBy { get; set; }
 		public string LastUncommitedChangeTimestamp { get; set; }	// This should be a datetime object
 		
+		private XElement createXmlWithMembers( string XmlKeyword, List<string> RuleProperty = null, bool Required = false) {
+			XElement nodeXml = new XElement(XmlKeyword);
+			if (RuleProperty != null) {
+				foreach (string member in RuleProperty) {
+					nodeXml.Add(
+						new XElement("member",member)
+					);
+				}
+			} else {
+				if (!(Required)) {
+					return null;
+				}
+				nodeXml.Add(
+					new XElement("member","any")
+				);
+			}
+			return nodeXml;
+		}
+
+		private XElement createXmlWithSingleMember( string XmlKeyword, string RuleProperty = null) {
+			XElement nodeXml = new XElement(XmlKeyword);
+			if (RuleProperty != null) {
+				nodeXml.Add( new XElement( "member",RuleProperty ));
+				return nodeXml;
+			} else {
+				return null;
+			}
+		}
+
+		private XElement createXmlWithoutMembers( string XmlKeyword, string RuleProperty) {
+			if (!(String.IsNullOrEmpty(RuleProperty))) {
+				XElement nodeXml = new XElement(XmlKeyword,RuleProperty);
+				return nodeXml;
+			} else {
+				return null;
+			}
+		}
+
+		private XElement createXmlBool( string XmlKeyword, bool RuleProperty ) {
+			XElement nodeXml = new XElement(XmlKeyword);
+			if (RuleProperty) {
+				nodeXml.Value = "yes";
+			} else {
+				nodeXml.Value = "no";
+			}
+			return nodeXml;
+		}
+
 		public XElement Xml () {
                     
-			// Create root, this will be stripped off, but is required to use the builtin xml functions
-			XDocument XmlObject = new XDocument(
-				//new XElement("entry")
-			);
+			// Create root
+			XDocument XmlObject = new XDocument();
 			
-			XElement EntryXml = new XElement("entry");
-			EntryXml.SetAttributeValue("name",this.Name);
-			XmlObject.Add(EntryXml);
-			//XmlObject.Element("entry").SetAttributeValue("name",this.Name);
+			// create entry nod and define name attribute
+			XElement xmlEntry = new XElement("entry");
+			xmlEntry.SetAttributeValue("name",this.Name);
+			XmlObject.Add(xmlEntry);
+
+
+			// ---------------------------------- Description and Tags ---------------------------------- //
+			XmlObject.Element("entry").Add( createXmlWithoutMembers( "description", this.Description ));	// Description
+			XmlObject.Element("entry").Add( createXmlWithMembers( "tag", this.Tags ));				            // Tags
+			// ------------------------------------------------------------------------------------------ //
+
+
+			// ---------------------------------------- Zones ----------------------------------------- //
+			XmlObject.Element("entry").Add( createXmlWithMembers( "from", this.SourceZone, true ));			// Source Zones
+			XmlObject.Element("entry").Add( createXmlWithMembers( "to", this.DestinationZone, true ));	// Destination Zones
+			// ---------------------------------------------------------------------------------------- //
+
+
+			// -------------------------------------------- Addresses --------------------------------------------- //
+			XmlObject.Element("entry").Add( createXmlWithMembers( "source", this.SourceAddress, true ));						// Source Addresses
+			XmlObject.Element("entry").Add( createXmlWithMembers( "destination", this.DestinationAddress, true ));	// Destination Address
+			// ---------------------------------------------------------------------------------------------------- //
+
+
+			// ------------------------------------ Users and Hip Profiles ------------------------------------ //
+			XmlObject.Element("entry").Add( createXmlWithMembers( "source-user", this.SourceUser, true ));      // Source User
+			XmlObject.Element("entry").Add( createXmlWithMembers( "hip-profiles", this.HipProfile, true ));     // Hip Profiles
+			// ------------------------------------------------------------------------------------------------ //
+
+
+			// -------------------------- Applications, Services, and URL Category --------------------------- //
+			XmlObject.Element("entry").Add( createXmlWithMembers( "application", this.Application, true ));    // Applications
+			XmlObject.Element("entry").Add( createXmlWithMembers( "service", this.Service, true ));            // Services
+			XmlObject.Element("entry").Add( createXmlWithMembers( "category", this.UrlCategory, true ));       // Url Category
+			// ----------------------------------------------------------------------------------------------- //
+
+
+			// ------------------------------------- Address Negation ------------------------------------- //
+			XmlObject.Element("entry").Add( createXmlBool("negate-source",this.SourceNegate) );			        // Source Negate
+			XmlObject.Element("entry").Add( createXmlBool("negate-destination",this.DestinationNegate) );		// Destination Negate
+			// -------------------------------------------------------------------------------------------- //
+
 			
-			if (!(String.IsNullOrEmpty(this.Description))) {
-				XElement ThisDescription = new XElement("description",this.Description);
-				XmlObject.Element("entry").Add(ThisDescription);
-			}
-			
-			// Set Tags
-			if (this.Tags != null) {
-				XElement ThisTags = new XElement("tag");
-				  
-				foreach (string ThisTag in this.Tags) {
-					ThisTags.Add(
-						new XElement("member",ThisTag)
-					);
-				}
-				XmlObject.Element("entry").Add(ThisTags);
-			}
-			
-			// Set Source Zones
-			XElement ThisSourceZones = new XElement("from");
-			
-			if (this.SourceZone != null) {			
-				foreach (string ThisSourceZone in this.SourceZone) {
-					ThisSourceZones.Add(
-						new XElement("member",ThisSourceZone)
-					);
-				}
-			} else {
-				ThisSourceZones.Add(
-					new XElement("member","any")
+			// ----------------------------------- Action ----------------------------------- //
+			XElement xmlAction = new XElement("action");
+			if (this.Allow) { xmlAction.Value = "allow"; } 																		// Allow
+			           else { xmlAction.Value = "deny";  }																		// Deny
+			XmlObject.Element("entry").Add(xmlAction);
+			// ------------------------------------------------------------------------------ //
+
+
+			// ------------------------------ Security Profiles ----------------------------- //
+			if (this.ProfileExists) {
+				XElement xmlProfileSetting = new XElement("profile-setting",
+					new XElement("profiles")
 				);
+
+				xmlProfileSetting.Element("profiles").Add( createXmlWithSingleMember( "virus", this.AntivirusProfile ));
+				xmlProfileSetting.Element("profiles").Add( createXmlWithSingleMember( "spyware", this.AntiSpywareProfile ));
+				xmlProfileSetting.Element("profiles").Add( createXmlWithSingleMember( "vulnerability", this.VulnerabilityProfile ));
+				xmlProfileSetting.Element("profiles").Add( createXmlWithSingleMember( "url-filtering", this.UrlFilteringProfile ));
+				xmlProfileSetting.Element("profiles").Add( createXmlWithSingleMember( "file-blocking", this.FileBlockingProfile ));
+				xmlProfileSetting.Element("profiles").Add( createXmlWithSingleMember( "data-filtering", this.DataFilteringProfile ));
+
+				XmlObject.Element("entry").Add(xmlProfileSetting);
 			}
-			
-			XmlObject.Element("entry").Add(ThisSourceZones);
-			
-			// Set Source Addresses
-			XElement ThisSourceAddresses = new XElement("source");
-			
-			if (this.SourceAddress != null) {			
-				foreach (string ThisSourceAddress in this.SourceAddress) {
-					ThisSourceAddresses.Add(
-						new XElement("member",ThisSourceAddress)
-					);
-				}
-			} else {
-				ThisSourceAddresses.Add(
-					new XElement("member","any")
-				);
+
+			if (!(String.IsNullOrEmpty(this.ProfileGroup))) {
+				XElement xmlProfileSetting = new XElement("profile-setting");
+				xmlProfileSetting.Add( createXmlWithSingleMember( "group", this.ProfileGroup ));
+					//createXmlWithMembers( "group", this.ProfileGroup )
+				XmlObject.Element("entry").Add(xmlProfileSetting);
 			}
-			
-			XmlObject.Element("entry").Add(ThisSourceAddresses);
-			
-			// Set Source Negate
-			if (this.SourceNegate) {
-				XElement ThisSourceNegate = new XElement("negate-source","yes");
-				XmlObject.Element("entry").Add(ThisSourceNegate);
-			} else {
-				XElement ThisSourceNegate = new XElement("negate-source","no");
-				XmlObject.Element("entry").Add(ThisSourceNegate);
+
+			//Need to overload CreateXmlWithMembers for a string value for profiles
+/*
+				CliList.Add(" profile-setting profiles");
+				CliList.Add(createCliWithoutMembers( "virus", this.AntivirusProfile ));
+				CliList.Add(createCliWithoutMembers( "spyware", this.AntiSpywareProfile ));
+				CliList.Add(createCliWithoutMembers( "vulnerability", this.VulnerabilityProfile ));
+				CliList.Add(createCliWithoutMembers( "url-filtering", this.UrlFilteringProfile ));
+				CliList.Add(createCliWithoutMembers( "file-blocking", this.FileBlockingProfile ));
+				CliList.Add(createCliWithoutMembers( "data-filtering", this.DataFilteringProfile ));
 			}
-			
-			// Set Source User
-			XElement ThisSourceUsers = new XElement("source-user");
-			
-			if (this.SourceUser != null) {			
-				foreach (string ThisSourceUser in this.SourceUser) {
-					ThisSourceUsers.Add(
-						new XElement("member",ThisSourceUser)
-					);
-				}
-			} else {
-				ThisSourceUsers.Add(
-					new XElement("member","any")
-				);
-			}
-			
-			XmlObject.Element("entry").Add(ThisSourceUsers);
-			
-			// Set Hip Profile
-			XElement ThisHipProfiles = new XElement("hip-profiles");
-			
-			if (this.HipProfile != null) {			
-				foreach (string ThisHipProfile in this.HipProfile) {
-					ThisHipProfiles.Add(
-						new XElement("member",ThisHipProfile)
-					);
-				}
-			} else {
-				ThisHipProfiles.Add(
-					new XElement("member","any")
-				);
-			}
-			
-			XmlObject.Element("entry").Add(ThisHipProfiles);
-			
-			// Set Destination Zones
-			XElement ThisDestinationZones = new XElement("to");
-			
-			if (this.DestinationZone != null) {			
-				foreach (string ThisDestinationZone in this.DestinationZone) {
-					ThisDestinationZones.Add(
-						new XElement("member",ThisDestinationZone)
-					);
-				}
-			} else {
-				ThisDestinationZones.Add(
-					new XElement("member","any")
-				);
-			}
-			
-			XmlObject.Element("entry").Add(ThisDestinationZones);
-			
-			// Set Destination Addresses
-			XElement ThisDestinationAddresses = new XElement("destination");
-			
-			if (this.DestinationAddress != null) {			
-				foreach (string ThisDestinationAddress in this.DestinationAddress) {
-					ThisDestinationAddresses.Add(
-						new XElement("member",ThisDestinationAddress)
-					);
-				}
-			} else {
-				ThisDestinationAddresses.Add(
-					new XElement("member","any")
-				);
-			}
-			
-			XmlObject.Element("entry").Add(ThisDestinationAddresses);
-			
-			// Set Destination Negate
-			if (this.DestinationNegate) {
-				XElement ThisDestinationNegate = new XElement("negate-destination","yes");
-				XmlObject.Element("entry").Add(ThisDestinationNegate);
-			} else {
-				XElement ThisDestinationNegate = new XElement("negate-destination","no");
-				XmlObject.Element("entry").Add(ThisDestinationNegate);
-			}
-			
-			// Set Application
-			XElement ThisApplications = new XElement("application");
-			
-			if (this.Application != null) {			
-				foreach (string ThisApplication in this.Application) {
-					ThisApplications.Add(
-						new XElement("member",ThisApplication)
-					);
-				}
-			} else {
-				ThisApplications.Add(
-					new XElement("member","any")
-				);
-			}
-			
-			XmlObject.Element("entry").Add(ThisApplications);
-			
-			// Set Url Category
-			XElement ThisUrlCategorys = new XElement("category");
-			
-			if (this.UrlCategory != null) {			
-				foreach (string ThisUrlCategory in this.UrlCategory) {
-					ThisUrlCategorys.Add(
-						new XElement("member",ThisUrlCategory)
-					);
-				}
-			} else {
-				ThisUrlCategorys.Add(
-					new XElement("member","any")
-				);
-			}
-			
-			XmlObject.Element("entry").Add(ThisUrlCategorys);
-			
-			// Set Action
-			if (this.Allow) {
-				XElement ThisAllow = new XElement("action","allow");
-				XmlObject.Element("entry").Add(ThisAllow);
-			} else {
-				XElement ThisAllow = new XElement("action","deny");
-				XmlObject.Element("entry").Add(ThisAllow);
-			}
+
+			if (!(String.IsNullOrEmpty(this.ProfileGroup))) {
+				CliList.Add(" profile-settings group ");
+				CliList.Add(this.ProfileGroup);
+			}			
+
+			// ------------------------------------------------------------------------------ //
 			
 			// Set Profile Group
 			if (!(String.IsNullOrEmpty(this.ProfileGroup))) {
 				XElement ThisProfileGroup = new XElement("profile-setting");
 				ThisProfileGroup.Add(
 					new XElement("group",
-						new XElement("member",this.ProfileGroup)   // NEED TO ACCOUNT FOR GROUP NONE
+						new XElement("member",this.ProfileGroup)
 					)
 				);
 				XmlObject.Element("entry").Add(ThisProfileGroup);
@@ -468,6 +421,7 @@ namespace PowerAlto {
 				XmlObject.Element("entry").Add(ThisProfileSetting);
 			}
 			
+*/
 			// Set Log At Start
 			if (this.LogAtSessionStart) {
 				XElement LogAtSessionStartXml = new XElement("log-start","yes");
@@ -539,26 +493,18 @@ namespace PowerAlto {
 			return Xml().ToString(SaveOptions.DisableFormatting);
 		}
 		
-		public string PrintCliOutput () {
+		public string PrintCli () {
 			List<string> CliList = new List<string>();
 			
 			// Start command and add name
 			CliList.Add("set rulebase security rules ");
 			CliList.Add(this.Name);
 			
-			// Description
-			if (!(String.IsNullOrEmpty(this.Description))) {
-				CliList.Add(" description ");
-				CliList.Add(this.Description);
-			}
-			
-			// Tags
-			CliList.Add(createCliWithMembers( "tag", this.Tags ));
-			
-			
-			
-			
-			
+			// ---------------------------- Description and Tags ---------------------------- //
+			CliList.Add(createCliWithoutMembers( "description", this.Description));		  	  	// Description
+			CliList.Add(createCliWithMembers( "tag", this.Tags ));							  						// Tags
+			// ------------------------------------------------------------------------------ //
+
 			
 			// --------------------------- Users and Hip Profiles --------------------------- //
 			CliList.Add(createReqCliWithMembers( "source-user", this.SourceUser ));           // Source User
@@ -567,19 +513,19 @@ namespace PowerAlto {
 
 
 			// ------------------------------ Address Negation ------------------------------ //
-			CliList.Add(createCliBool( "negate-source", this.SourceNegate));				  // Source Negate
-			CliList.Add(createCliBool( "negate-destination", this.DestinationNegate));		  // Destination Negate
+			CliList.Add(createCliBool( "negate-source", this.SourceNegate));				  				// Source Negate
+			CliList.Add(createCliBool( "negate-destination", this.DestinationNegate));		  	// Destination Negate
 			// ------------------------------------------------------------------------------ //
 
 
 			// ----------------------------------- Zones ------------------------------------ //
-			CliList.Add(createReqCliWithMembers( "from", this.SourceZone ));				  // Source Zones
-			CliList.Add(createReqCliWithMembers( "to", this.DestinationZone ));				  // Destination Zones
+			CliList.Add(createReqCliWithMembers( "from", this.SourceZone ));				  				// Source Zones
+			CliList.Add(createReqCliWithMembers( "to", this.DestinationZone ));				  			// Destination Zones
 			// ------------------------------------------------------------------------------ //
 
 
-			// ----------------------------------- Zones ------------------------------------ //
-			CliList.Add(createReqCliWithMembers( "source", this.SourceAddress ));			  // Source Addresses
+			// --------------------------------- Addresses ---------------------------------- //
+			CliList.Add(createReqCliWithMembers( "source", this.SourceAddress ));						  // Source Addresses
 			CliList.Add(createReqCliWithMembers( "destination", this.DestinationAddress ));	  // Destination Addresses
 			// ------------------------------------------------------------------------------ //
 
@@ -595,7 +541,21 @@ namespace PowerAlto {
 			           else { CliList.Add(" action deny");  }                                 // Deny
 			// ------------------------------------------------------------------------------ //
 
-			
+
+			// -------------------------------- Log Settings -------------------------------- //
+			CliList.Add(createCliBool( "log-start", this.LogAtSessionStart));				  				// Log At Start
+			CliList.Add(createCliBool( "log-end", this.LogAtSessionEnd));					  					// Log At End
+			CliList.Add(createCliWithoutMembers( "log-setting", this.LogForwarding));		  		// Log Forwarding
+			// ------------------------------------------------------------------------------ //
+
+
+			// ----------------------------- Schedule and DSRI ------------------------------ //
+			CliList.Add(createCliWithoutMembers( "schedule", this.Schedule));				  				// Schedule
+			string cmdDisableSRI = "option disable-server-response-inspection";
+			CliList.Add(createCliBool( cmdDisableSRI, this.DisableSRI));										  // Disable SRI
+			// ------------------------------------------------------------------------------ //
+
+
 			// ------------------------------ Security Profiles ----------------------------- //
 			if (this.ProfileExists) {
 				CliList.Add(" profile-setting profiles");
@@ -614,30 +574,12 @@ namespace PowerAlto {
 			// ------------------------------------------------------------------------------ //
 
 
-			// -------------------------------- Log Settings -------------------------------- //
-			CliList.Add(createCliBool( "log-start", this.LogAtSessionStart));				  // Log At Start
-			CliList.Add(createCliBool( "log-end", this.LogAtSessionEnd));					  // Log At End
-			CliList.Add(createCliWithoutMembers( "log-setting", this.LogForwarding));		  // Log Forwarding
-			// ------------------------------------------------------------------------------ //
-
-
-			// ----------------------------- Schedule and DSRI ------------------------------ //
-			CliList.Add(createCliWithoutMembers( "schedule", this.Schedule));				  // Schedule
-			string cmdDisableSRI = "option disable-server-response-inspection";
-			CliList.Add(createCliBool( cmdDisableSRI, this.DisableSRI));					  // Disable SRI
-			// ------------------------------------------------------------------------------ //
-
-
-
-			
-/*
-		public string Schedule { get; set; }
-		public string QosType { get; set; }
-		public string QosMarking { get; set; }
-		
-		public bool DisableSRI { get; set; }
-*/			
-			
+			// -------------------------------- QoS Settings -------------------------------- //
+			if (!(String.IsNullOrEmpty(this.QosType)) && !(String.IsNullOrEmpty(this.QosMarking))) {
+				string cliQos = " qos marking " + this.QosType + " " + this.QosMarking;
+				CliList.Add(cliQos);
+			}
+			// ------------------------------------------------------------------------------ //			
 			
 			string CliString = string.Join("",CliList.ToArray());  // Smash it all together
 			return CliString;
