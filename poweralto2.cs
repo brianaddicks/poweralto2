@@ -298,8 +298,8 @@ namespace PowerAlto {
 
 
 			// ------------------------------------- Address Negation ------------------------------------- //
-			XmlObject.Element("entry").Add( createXmlBool("negate-source",this.SourceNegate) );			        // Source Negate
-			XmlObject.Element("entry").Add( createXmlBool("negate-destination",this.DestinationNegate) );		// Destination Negate
+			XmlObject.Element("entry").Add( createXmlBool( "negate-source", this.SourceNegate ));			      // Source Negate
+			XmlObject.Element("entry").Add( createXmlBool( "negate-destination", this.DestinationNegate ));	// Destination Negate
 			// -------------------------------------------------------------------------------------------- //
 
 			
@@ -329,128 +329,35 @@ namespace PowerAlto {
 
 			if (!(String.IsNullOrEmpty(this.ProfileGroup))) {
 				XElement xmlProfileSetting = new XElement("profile-setting");
+
 				xmlProfileSetting.Add( createXmlWithSingleMember( "group", this.ProfileGroup ));
-					//createXmlWithMembers( "group", this.ProfileGroup )
+
 				XmlObject.Element("entry").Add(xmlProfileSetting);
 			}
-
-			//Need to overload CreateXmlWithMembers for a string value for profiles
-/*
-				CliList.Add(" profile-setting profiles");
-				CliList.Add(createCliWithoutMembers( "virus", this.AntivirusProfile ));
-				CliList.Add(createCliWithoutMembers( "spyware", this.AntiSpywareProfile ));
-				CliList.Add(createCliWithoutMembers( "vulnerability", this.VulnerabilityProfile ));
-				CliList.Add(createCliWithoutMembers( "url-filtering", this.UrlFilteringProfile ));
-				CliList.Add(createCliWithoutMembers( "file-blocking", this.FileBlockingProfile ));
-				CliList.Add(createCliWithoutMembers( "data-filtering", this.DataFilteringProfile ));
-			}
-
-			if (!(String.IsNullOrEmpty(this.ProfileGroup))) {
-				CliList.Add(" profile-settings group ");
-				CliList.Add(this.ProfileGroup);
-			}			
-
 			// ------------------------------------------------------------------------------ //
-			
-			// Set Profile Group
-			if (!(String.IsNullOrEmpty(this.ProfileGroup))) {
-				XElement ThisProfileGroup = new XElement("profile-setting");
-				ThisProfileGroup.Add(
-					new XElement("group",
-						new XElement("member",this.ProfileGroup)
-					)
-				);
-				XmlObject.Element("entry").Add(ThisProfileGroup);
-			}
-			
-			// Set Individual Profiles
-			if (this.ProfileExists) {
-				
-				XElement ThisProfileSetting = new XElement("profile-setting",
-					new XElement("profiles")
-				);
-				
-				// Set Antivirus Profile
-				if (!(String.IsNullOrEmpty(this.AntivirusProfile))) {
-					XElement AntivirusProfileXml = new XElement("virus",
-						new XElement("member",this.AntivirusProfile)
-					);
-					ThisProfileSetting.Element("profiles").Add(AntivirusProfileXml);
-				}
-				
-				// Set Vulnerability Profile
-				if (!(String.IsNullOrEmpty(this.VulnerabilityProfile))) {
-					XElement VulnerabilityProfileXml = new XElement("vulnerability",
-						new XElement("member",this.VulnerabilityProfile)
-					);
-					ThisProfileSetting.Element("profiles").Add(VulnerabilityProfileXml);
-				}
-				
-				// Set AntiSpyware Profile
-				if (!(String.IsNullOrEmpty(this.AntiSpywareProfile))) {
-					XElement AntiSpywareProfileXml = new XElement("spyware",
-						new XElement("member",this.AntiSpywareProfile)
-					);
-					ThisProfileSetting.Element("profiles").Add(AntiSpywareProfileXml);
-				}
-				
-				// Set Url Filtering Profile
-				if (!(String.IsNullOrEmpty(this.UrlFilteringProfile))) {
-					XElement UrlFilteringProfileXml = new XElement("url-filtering",
-						new XElement("member",this.UrlFilteringProfile)
-					);
-					ThisProfileSetting.Element("profiles").Add(UrlFilteringProfileXml);
-				}
-				
-				// Set File Blocking Profile
-				if (!(String.IsNullOrEmpty(this.FileBlockingProfile))) {
-					XElement FileBlockingProfileXml = new XElement("file-blocking",
-						new XElement("member",this.FileBlockingProfile)
-					);
-					ThisProfileSetting.Element("profiles").Add(FileBlockingProfileXml);
-				}
-				
-				// Set Data Filtering Profile
-				if (!(String.IsNullOrEmpty(this.DataFilteringProfile))) {
-					XElement DataFilteringProfileXml = new XElement("data-filtering",
-						new XElement("member",this.DataFilteringProfile)
-					);
-					ThisProfileSetting.Element("profiles").Add(DataFilteringProfileXml);
-				}
-				
-				XmlObject.Element("entry").Add(ThisProfileSetting);
-			}
-			
-*/
-			// Set Log At Start
-			if (this.LogAtSessionStart) {
-				XElement LogAtSessionStartXml = new XElement("log-start","yes");
-				XmlObject.Element("entry").Add(LogAtSessionStartXml);
+
+
+			// -------------------------------- Log Settings -------------------------------- //
+			XmlObject.Element("entry").Add( createXmlBool( "log-start", this.LogAtSessionStart));				  				// Log At Start
+			XmlObject.Element("entry").Add( createXmlBool( "log-end", this.LogAtSessionEnd));					  					// Log At End
+			XmlObject.Element("entry").Add( createXmlWithoutMembers( "log-setting", this.LogForwarding));		  		// Log Forwarding
+			// ------------------------------------------------------------------------------ //
+
+
+			// ----------------------------- Schedule and DSRI ------------------------------ //
+			XmlObject.Element("entry").Add( createXmlWithoutMembers( "schedule", this.Schedule));				  				// Schedule
+			// ------------------------------------------------------------------------------ //
+
+			// Set Disable Server Response Inspection
+			XElement xmlDisableSRI = new XElement("option");
+			if (this.DisableSRI) {
+				xmlDisableSRI.Element("option").Add( createXmlWithoutMembers( "disable-server-response-inspection", "yes" ));
 			} else {
-				XElement LogAtSessionStartXml = new XElement("log-start","no");
-				XmlObject.Element("entry").Add(LogAtSessionStartXml);
+				xmlDisableSRI.Element("option").Add( createXmlWithoutMembers( "disable-server-response-inspection", "no" ));
 			}
-			
-			// Set Log At End
-			if (this.LogAtSessionEnd) {
-				XElement LogAtSessionEndXml = new XElement("log-end","yes");
-				XmlObject.Element("entry").Add(LogAtSessionEndXml);
-			} else {
-				XElement LogAtSessionEndXml = new XElement("log-end","no");
-				XmlObject.Element("entry").Add(LogAtSessionEndXml);
-			}
-			
-			// Set Log Forwarding
-			if (!(String.IsNullOrEmpty(this.LogForwarding))) {
-				XElement LogForwardingXml = new XElement("log-setting",this.LogForwarding);
-				XmlObject.Element("entry").Add(LogForwardingXml);
-			}
-			
-			// Set Schedule
-			if (!(String.IsNullOrEmpty(this.Schedule))) {
-				XElement ScheduleXml = new XElement("schedule",this.Schedule);
-				XmlObject.Element("entry").Add(ScheduleXml);
-			}
+			XmlObject.Element("entry").Add(xmlDisableSRI);
+
+
 			
 			// Set Qos Marking
 			if (!(String.IsNullOrEmpty(this.QosMarking)) && !(String.IsNullOrEmpty(this.QosType))) {
@@ -469,18 +376,6 @@ namespace PowerAlto {
 				XmlObject.Element("entry").Add(QosXml);
 			}
 			
-			// Set Disable Server Response Inspection
-			if (this.DisableSRI) {
-				XElement DisableSRIXml = new XElement("option",
-					new XElement("disable-server-response-inspection","yes")
-				);
-				XmlObject.Element("entry").Add(DisableSRIXml);
-			} else {
-				XElement DisableSRIXml = new XElement("option",
-					new XElement("disable-server-response-inspection","no")
-				);
-				XmlObject.Element("entry").Add(DisableSRIXml);
-			}
 			
 			return XmlObject.Element("entry");
 	    }
