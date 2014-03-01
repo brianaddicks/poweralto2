@@ -148,51 +148,49 @@ namespace PowerAlto {
 		
 		public bool Allow { get; set; } //true = allow, false = deny
 		
-		//private bool IsGroup = false;
 		private bool ProfileExists = false;
 		
+		private string setSecurityProfile ( string profileValue, string profileGroup = null ) {
+			if (!(String.IsNullOrEmpty(profileGroup))) {
+				throw new System.ArgumentException("Individual Security Profiles cannot be set with a Profile Group");
+			} else {
+				this.ProfileExists = true;
+				return profileValue;
+			}
+		}
+
 		private string profilegroup;
-		public string ProfileGroup {
-			get {
-				return this.profilegroup;
-			}
-			set {
-				if (this.ProfileExists) {
-					throw new System.ArgumentException("Profile Group cannot be set with individual profiles");
-				} else {
-					this.profilegroup = value;
-				}
-			}
-		}
+		public string ProfileGroup { get { return this.profilegroup; }
+																 set { if (this.ProfileExists) {
+																				 throw new System.ArgumentException("Profile Group cannot be set with individual profiles");
+																			 } else {
+																				 this.profilegroup = value;
+																			 } } }		
 		
+		private string antivirusProfile;
+		private string vulnerabilityProfile;
+		private string antiSpywareProfile;
+		private string urlFilteringProfile;
+		private string fileBlockingProfile;
+		private string dataFilteringProfile;
+
+		public string AntivirusProfile { get { return this.antivirusProfile; }
+																		 set { this.antivirusProfile = setSecurityProfile( value, this.ProfileGroup ); } }
+
+		public string VulnerabilityProfile { get { return this.vulnerabilityProfile; }
+			                                   set { this.vulnerabilityProfile = setSecurityProfile( value, this.ProfileGroup ); } }
 		
-		private string antivirusprofile;
-		public string AntivirusProfile {
-			get {
-				return this.antivirusprofile;
-			}
-			set {
-				this.antivirusprofile = value;
-				this.ProfileExists = true;
-			}
-		}
-		
-		//public string VulnerabilityProfile { get; set; }
-		private string vulnerabilityprofile;
-		public string VulnerabilityProfile {
-			get {
-				return this.vulnerabilityprofile;
-			}
-			set {
-				this.vulnerabilityprofile = value;
-				this.ProfileExists = true;
-			}
-		}
-		
-		public string AntiSpywareProfile { get; set; }
-		public string UrlFilteringProfile { get; set; }
-		public string FileBlockingProfile { get; set; }
-		public string DataFilteringProfile { get; set; }
+		public string AntiSpywareProfile { get { return this.antiSpywareProfile; }
+																		   set { this.antiSpywareProfile = setSecurityProfile( value, this.ProfileGroup ); } }
+
+		public string UrlFilteringProfile { get { return this.urlFilteringProfile; }
+																		 		set { this.urlFilteringProfile = setSecurityProfile( value, this.ProfileGroup ); } }
+
+		public string FileBlockingProfile { get { return this.fileBlockingProfile; }
+																		 		set { this.fileBlockingProfile = setSecurityProfile( value, this.ProfileGroup ); } }
+
+		public string DataFilteringProfile { get { return this.dataFilteringProfile; }
+																		 		 set { this.dataFilteringProfile = setSecurityProfile( value, this.ProfileGroup ); } }
 		
 		public bool LogAtSessionStart { get; set; }
 		public bool LogAtSessionEnd { get; set; }
@@ -348,22 +346,19 @@ namespace PowerAlto {
 			XmlObject.Element("entry").Add( createXmlWithoutMembers( "schedule", this.Schedule));				  				// Schedule
 			// ------------------------------------------------------------------------------ //
 
+
 			// Set Disable Server Response Inspection
-			XElement xmlDisableSRI = new XElement("option");
-			if (this.DisableSRI) {
-				xmlDisableSRI.Element("option").Add( createXmlWithoutMembers( "disable-server-response-inspection", "yes" ));
-			} else {
-				xmlDisableSRI.Element("option").Add( createXmlWithoutMembers( "disable-server-response-inspection", "no" ));
-			}
+			XElement xmlDisableSRI = new XElement("option",
+				createXmlBool( "disable-server-response-inspection", this.DisableSRI )
+			);
+
 			XmlObject.Element("entry").Add(xmlDisableSRI);
 
 
 			
 			// Set Qos Marking
 			if (!(String.IsNullOrEmpty(this.QosMarking)) && !(String.IsNullOrEmpty(this.QosType))) {
-				XElement QosXml = new XElement("qos",
-					new XElement("marking")
-				);
+				XElement QosXml = new XElement("qos", new XElement( "marking" ));
 				
 				if (this.QosType == "dscp") {
 					XElement QosMarkingXml = new XElement("ip-dscp",this.QosMarking);
@@ -376,9 +371,8 @@ namespace PowerAlto {
 				XmlObject.Element("entry").Add(QosXml);
 			}
 			
-			
 			return XmlObject.Element("entry");
-	    }
+	  }
 
 		public string PrintPrettyXml() {
 			return Xml().ToString();
