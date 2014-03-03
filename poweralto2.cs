@@ -9,8 +9,24 @@ using System.Linq;
 using System.Web;
 using System.Xml;
 using System.Xml.Linq;
+using System.Text.RegularExpressions;
 
 namespace PowerAlto {
+
+	public class HelperClass {
+		public string paAlphaNum (string Name) {
+			string namePattern =  @"^[a-zA-Z0-9\-_\.]+$";
+			Regex nameRx = new Regex(namePattern);
+			Match nameMatch = nameRx.Match(Name);
+			if (nameMatch.Success) {
+				return Name;
+			} else {
+				throw new System.ArgumentException("Value can only contain alphanumeric, hyphens, underscores, or periods.");
+			}
+		}
+	}
+
+
 	public class PaDevice {
 		// can we rewrite the helper functions as methods in this class?
 		
@@ -124,9 +140,83 @@ namespace PowerAlto {
 		
 	}
 	
+	public class AddressObject {
+
+		private string paNameMatch (string Name) {
+			string namePattern =  @"^[a-zA-Z0-9\-_\.]+$";
+			Regex nameRx = new Regex(namePattern);
+			Match nameMatch = nameRx.Match(Name);
+			if (nameMatch.Success) {
+				return Name;
+			} else {
+				throw new System.ArgumentException("Value can only contain alphanumeric, hyphens, underscores, or periods.");
+			}
+		}
+
+		private string name;
+		public string Name { get { return this.name; }
+												 set { this.name = paNameMatch( value ); } }
+
+		public string Description;
+
+		private string addressType;
+		public string AddressType { get { return this.addressType; } }
+
+		private string ipAddressMatch (string Input) {
+			string ipAddressMaskPattern = @"^\d+\.\d+\.\d+\.\d+(\/\d{2})?$"; //need better validation
+			Regex ipAddressMaskRx = new Regex(ipAddressMaskPattern);
+			Match ipAddressMaskMatch = ipAddressMaskRx.Match(Input);
+
+			string ipRangePattern = @"^\d+\.\d+\.\d+\.\d+\-\d+\.\d+\.\d+\.\d+$";
+			Regex ipRangeRx = new Regex(ipRangePattern);
+			Match ipRangeMatch = ipRangeRx.Match(Input);
+
+			string fqdnPattern = @"^.+(\..+)+"; //needs better validation
+			Regex fqdnRx = new Regex(fqdnPattern);
+			Match fqdnMatch = fqdnRx.Match(Input);
+
+			if (ipAddressMaskMatch.Success) {
+				this.addressType = "ip-netmask";
+				return Input;
+			}
+
+			if (ipRangeMatch.Success) {
+				this.addressType = "ip-range";
+				return Input;
+			}
+
+			if (fqdnMatch.Success) {
+				this.addressType = "fqdn";
+				return Input;
+			}
+
+			throw new System.ArgumentException("Does not match");
+		}
+
+		private string address;
+		public string Address { get { return this.address; }
+														set { this.address = ipAddressMatch( value ); } }
+
+		public List<string> Tags { get; set; }
+	}
+
 	public class SecurityRule {
+
+		private string paNameMatch (string Name) {
+			string namePattern =  @"^[a-zA-Z0-9\-_\.]+$";
+			Regex nameRx = new Regex(namePattern);
+			Match nameMatch = nameRx.Match(Name);
+			if (nameMatch.Success) {
+				return Name;
+			} else {
+				throw new System.ArgumentException("Value can only contain alphanumeric, hyphens, underscores, or periods.");
+			}
+		}
 	
-		public string Name { get; set; }
+		private string name;
+		public string Name { get { return this.name; }
+												 set { this.name = paNameMatch( value ); } }
+
 		public string Description { get; set; }
 		public List<string> Tags { get; set; }
 		
@@ -201,6 +291,17 @@ namespace PowerAlto {
 		public string QosMarking { get; set; }
 		
 		public bool DisableSRI { get; set; }
+
+		public SecurityRule () {
+			this.SourceAddress = new List<string> {"any"};
+			this.SourceUser = new List<string> {"any"};
+			this.HipProfile = new List<string> {"any"};
+			this.DestinationAddress = new List<string> {"any"};
+			this.Application = new List<string> {"application-default"};
+			this.UrlCategory = new List<string> {"any"};
+			this.Allow = true;
+			this.LogAtSessionEnd = true;
+		}
 		
 		public string LastUncommitedChangeBy { get; set; }
 		public string LastUncommitedChangeTimestamp { get; set; }	// This should be a datetime object
@@ -518,6 +619,9 @@ namespace PowerAlto {
 			return CliObject;
 		}
 	}
+
+
+
 }
 
 
