@@ -321,6 +321,7 @@ namespace PowerAlto {
 		public string QosMarking { get; set; }
 		
 		public bool DisableSRI { get; set; }
+		public bool Disabled { get; set; }
 
 		public SecurityRule () {
 			this.SourceAddress = new List<string> {"any"};
@@ -477,6 +478,8 @@ namespace PowerAlto {
 			XmlObject.Element("entry").Add( createXmlWithoutMembers( "schedule", this.Schedule));				  				// Schedule
 			// ------------------------------------------------------------------------------ //
 
+			// ---------------------------------- Disabled ---------------------------------- //
+			XmlObject.Element("entry").Add( createXmlBool( "disabled", this.Disabled));
 
 			// Set Disable Server Response Inspection
 			XElement xmlDisableSRI = new XElement("option",

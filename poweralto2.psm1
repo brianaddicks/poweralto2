@@ -251,6 +251,7 @@ function Get-PaSecurityRule {
         # Other Settings
         $RuleObject.Schedule = $r.schedule
         if ($r.option.'disable-server-response-inspection' -eq 'yes') { $RuleObject.DisableSRI = $true }
+        if ($r.disabled -eq 'yes') { $RuleObject.Disabled = $true }
 
         $RuleTable += $RuleObject
     }
