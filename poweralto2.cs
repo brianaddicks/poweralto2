@@ -12,7 +12,20 @@ using System.Xml.Linq;
 using System.Text.RegularExpressions;
 
 namespace PowerAlto {
-
+/*
+	public class HelperClass {
+		public string paAlphaNum (string Name) {
+			string namePattern =  @"^[a-zA-Z0-9\-_\.]+$";
+			Regex nameRx = new Regex(namePattern);
+			Match nameMatch = nameRx.Match(Name);
+			if (nameMatch.Success) {
+				return Name;
+			} else {
+				throw new System.ArgumentException("Value can only contain alphanumeric, hyphens, underscores, or periods.");
+			}
+		}
+	}
+*/
 	public class PaDevice {
 		// can we rewrite the helper functions as methods in this class?
 		
