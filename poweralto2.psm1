@@ -261,8 +261,6 @@ function Get-PaSecurityRule {
 
 ###############################################################################
 
-
-#/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/zone
 function Get-PaZone {
     Param (
 		[Parameter(Mandatory=$False,Position=0)]
@@ -289,7 +287,16 @@ function Get-PaZone {
     foreach ($z in $ZoneData) {
         $ZoneObject = New-Object PowerAlto.Zone
 
-        $ZoneObject.Name = $z.name
+        $ZoneObject.Name                  = $z.name
+        $ZoneObject.LogSetting            = $z.network.'log-setting'
+        $ZoneObject.ZoneProtectionProfile = $z.network.'zone-protection-profile'
+        $ZoneObject.UserIdAclInclude      = $z.'user-acl'.'include-list'.member
+        $ZoneObject.UserIdAclExclude      = $z.'user-acl'.'exclude-list'.member
+
+        if ($z.'enable-user-identification') {
+            $ZoneObject.EnableUserIdentification = $true
+        }
+
 
         $IsLayer3 = $z.network.layer3
         if ($IsLayer3) {
