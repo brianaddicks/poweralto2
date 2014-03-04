@@ -6,6 +6,12 @@ Add-Type -ReferencedAssemblies @(
 	([System.Reflection.Assembly]::LoadWithPartialName("System.Xml.Linq")).Location
 	) -TypeDefinition ((gc "$ScriptPath\poweralto2.cs") -join "`n")
 
+Add-Type -ReferencedAssemblies @(
+    ([System.Reflection.Assembly]::LoadWithPartialName("System.Xml")).Location,
+    ([System.Reflection.Assembly]::LoadWithPartialName("System.Web")).Location,
+    ([System.Reflection.Assembly]::LoadWithPartialName("System.Xml.Linq")).Location
+    ) -TypeDefinition ((gc "$ScriptPath\poweralto-test.cs") -join "`n")
+
 Add-Type -AssemblyName System.Management.Automation
 
 ###############################################################################
@@ -418,7 +424,7 @@ function Get-PaService {
         $ResponseObject.DestinationPort = $r.protocol.$Protocol.port
 
         if ($r.protocol.$Protocol.'source-port') { $ResponseObject.SourcePort      = $r.protocol.$Protocol.'source-port' }
-        
+
         $ResponseObject.Tags            = HelperGetPropertyMembers $r tag
         $ResponseObject.Description     = $r.description
 
@@ -428,6 +434,60 @@ function Get-PaService {
     }
     
     return $ResponseTable
+}
+
+###############################################################################
+
+function Set-PaSecurityRule {
+    [CmdletBinding()]
+    Param (
+        [Parameter(Mandatory=$True)]
+        [string]$Name
+    )
+
+    $Xpath  = "/config/devices/entry/vsys/entry/rulebase/security"
+    $Xpath += "/entry[@name='$Name']"
+
+    $Action = "set"
+
+    $ElementObject = New-Object Poweralto.SecurityRule
+
+    $ElementObject.Name = $Name
+    Write-Debug
+
+    $ResponseData = Set-PaConfig -Xpath $Xpath -Action $Action -Element $ElementObject.PrintPlainXml() -Debug
+}
+
+###############################################################################
+
+function Set-PaConfig {
+    [CmdletBinding()]
+    Param (
+        [Parameter(Mandatory=$True,Position=0)]
+        [string]$Xpath = "/config",
+
+        [Parameter(Mandatory=$True,Position=1)]
+        [ValidateSet("set")]
+        [string]$Action,
+
+        [Parameter(Mandatory=$True,Position=2)]
+        [string]$Element
+    )
+
+    HelperCheckPaConnection
+
+    $QueryTable = @{ type    = "config"
+                     xpath   = $Xpath
+                     action  = $Action
+                     element = $Element }
+    
+    $QueryString = HelperCreateQueryString $QueryTable
+    Write-Debug $QueryString
+    $Url         = $PaDeviceObject.UrlBuilder($QueryString)
+    Write-Debug $Url
+    $Response    = HelperHttpQuery $Url -AsXML
+
+    return HelperCheckPaError $Response
 }
 
 ###############################################################################

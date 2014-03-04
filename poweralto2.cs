@@ -139,33 +139,7 @@ namespace PowerAlto {
 		
 	}
 	
-	public class Zone {
-		private string paNameMatch (string Name) {
-			string namePattern =  @"^[a-zA-Z0-9\-_\.]+$";
-			Regex nameRx = new Regex(namePattern);
-			Match nameMatch = nameRx.Match(Name);
-			if (nameMatch.Success) {
-				return Name;
-			} else {
-				throw new System.ArgumentException("Value can only contain alphanumeric, hyphens, underscores, or periods.");
-			}
-		}
-
-		private string name;
-		public string Name { get { return this.name; }
-												 set { this.name = paNameMatch( value ); } }
-		
-		public string ZoneType { get; set; } // validatset: tap, virtual wire layer2, layer3
-
-		public List<string> Interfaces { get; set; } //changing an interface zone will be done from the interface object
-
-		public string ZoneProtectionProfile { get; set; } //change to object once it's made
-		public string LogSetting { get; set; } //change to object once it's made
-		public bool EnableUserIdentification { get; set; }
-
-		public List<string> UserIdAclInclude { get; set; }
-		public List<string> UserIdAclExclude { get; set; }
-	}
+	
 
 	public class Service {
 
@@ -564,8 +538,25 @@ namespace PowerAlto {
 			return Xml().ToString();
 		}
 		
+		/*
+		private string paNameMatch (string Name) {
+			string namePattern =  @"^[a-zA-Z0-9\-_\.]+$";
+			Regex nameRx = new Regex(namePattern);
+			Match nameMatch = nameRx.Match(Name);
+			if (nameMatch.Success) {
+				return Name;
+			} else {
+				throw new System.ArgumentException("Value can only contain alphanumeric, hyphens, underscores, or periods.");
+			}
+		}
+		*/
+
 		public string PrintPlainXml() {
-			return Xml().ToString(SaveOptions.DisableFormatting);
+			//string plainXml = Xml().ToString(SaveOptions.DisableFormatting);
+
+			//string entryPattern = @"^<.+?>(.+)</entry>$"
+			return this.Xml().ToString(SaveOptions.DisableFormatting);
+
 		}
 		
 		public string PrintCli () {
