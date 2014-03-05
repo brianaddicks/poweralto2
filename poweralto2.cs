@@ -350,19 +350,22 @@ namespace PowerAlto {
 				return this.qosType;
 			}
 			set {
-				if (String.IsNullOrEmpty(value)) {
+				if (String.IsNullOrEmpty( value ) ) {
 					this.qosType = null;
-					this.QosMarking = null;
+					this.qosMarking = null;
 				} else {
 					string lowerValue = value.ToLower();
 					this.qosType = lowerValue;
-					/*if (lowerValue == "ip-dscp") {
+					if (lowerValue == "ip-dscp") {
 						this.qosType = "ip-dscp";
 					} else if (lowerValue == "ip-precedence") {
+						if (validDscpOnlyMarkings.Contains( this.qosMarking ) ) {
+							throw new ArgumentOutOfRangeException("Invalid QosMarking for QosType ip-precedence. Valid values are: " + string.Join(", ", validSharedQosMarkings.ToArray()));
+						}
 						this.qosType = "ip-precedence";
 					} else {
 						throw new ArgumentOutOfRangeException("Invalid value for QosType. Valid values are: ip-precedence, and ip-dscp");						
-					}*/
+					}
 				}
 			}
 		}
@@ -402,7 +405,7 @@ namespace PowerAlto {
 			set {
 				if (String.IsNullOrEmpty(value)) {
 					this.qosMarking = null;
-					this.QosType = null;
+					this.qosType = null;
 				} else {
 					string lowerValue = value.ToLower();
 					if ( validDscpOnlyMarkings.Contains( lowerValue ) ) {
