@@ -343,8 +343,81 @@ namespace PowerAlto {
 		public string LogForwarding { get; set; }
 		
 		public string Schedule { get; set; }
-		public string QosType { get; set; }
-		public string QosMarking { get; set; }
+
+		private string qosType;
+		public string QosType {
+			get {
+				return this.qosType;
+			}
+			set {
+				if (String.IsNullOrEmpty(value)) {
+					this.qosType = null;
+				} else {
+					string lowerValue = value.ToLower();
+					this.qosType = lowerValue;
+					/*if (lowerValue == "ip-dscp") {
+						this.qosType = "ip-dscp";
+					} else if (lowerValue == "ip-precedence") {
+						this.qosType = "ip-precedence";
+					} else {
+						throw new ArgumentOutOfRangeException("Invalid value for QosType. Valid values are: ip-precedence, and ip-dscp");						
+					}*/
+				}
+			}
+		}
+
+		List<string> validDscpOnlyMarkings = new List<string> (new string[] {
+			"af11",
+			"af12",
+			"af13",
+			"af21",
+			"af22",
+			"af23",
+			"af31",
+			"af32",
+			"af33",
+			"af41",
+			"af42",
+			"af43"
+		} );
+
+		List<string> validSharedQosMarkings = new List<string> (new string[] {
+			"cs0",
+			"cs1",
+			"cs2",
+			"cs3",
+			"cs4",
+			"cs5",
+			"cs6",
+			"cs7",
+			"ef"
+		} );
+
+		private string qosMarking;
+		public string QosMarking {
+			get {
+				return this.qosMarking;
+			}
+			set {
+				if (String.IsNullOrEmpty(value)) {
+					this.qosMarking = null;
+					this.QosType = null;
+				} else {
+					string lowerValue = value.ToLower();
+					if ( validDscpOnlyMarkings.Contains( lowerValue ) ) {
+						if (this.QosType == "ip-precedence" ) {
+							throw new ArgumentOutOfRangeException("Invalid value for ip-precedence. Valid values are: " + string.Join(", ", validSharedQosMarkings.ToArray()));
+						}
+						this.QosType = "ip-dscp";
+						this.qosMarking = lowerValue;
+					} else if ( validSharedQosMarkings.Contains( lowerValue) ) {
+						this.qosMarking = lowerValue;
+					} else {
+						throw new ArgumentOutOfRangeException("Invalid value. Valid values are: " + string.Join(", ", validDscpOnlyMarkings.ToArray()) + "," + string.Join(", ", validSharedQosMarkings.ToArray()));
+					}
+				}
+			}
+		}
 		
 		public bool DisableSRI { get; set; }
 		public bool Disabled { get; set; }
@@ -421,44 +494,30 @@ namespace PowerAlto {
 			xmlEntry.SetAttributeValue("name",this.Name);
 			XmlObject.Add(xmlEntry);
 
+			// Set Disable Server Response Inspection
 
-			// ---------------------------------- Description and Tags ---------------------------------- //
-			XmlObject.Element("entry").Add( createXmlWithoutMembers( "description", this.Description ));	// Description
-			XmlObject.Element("entry").Add( createXmlWithMembers( "tag", this.Tags ));				            // Tags
-			// ------------------------------------------------------------------------------------------ //
+			XElement xmlDisableSRI = new XElement("option",
+				createXmlBool( "disable-server-response-inspection", this.DisableSRI )
+			);
 
+			XmlObject.Element("entry").Add(xmlDisableSRI);
 
 			// ---------------------------------------- Zones ----------------------------------------- //
 			XmlObject.Element("entry").Add( createXmlWithMembers( "from", this.SourceZone, true ));			// Source Zones
 			XmlObject.Element("entry").Add( createXmlWithMembers( "to", this.DestinationZone, true ));	// Destination Zones
 			// ---------------------------------------------------------------------------------------- //
 
-
 			// -------------------------------------------- Addresses --------------------------------------------- //
 			XmlObject.Element("entry").Add( createXmlWithMembers( "source", this.SourceAddress, true ));						// Source Addresses
 			XmlObject.Element("entry").Add( createXmlWithMembers( "destination", this.DestinationAddress, true ));	// Destination Address
 			// ---------------------------------------------------------------------------------------------------- //
 
-
-			// ------------------------------------ Users and Hip Profiles ------------------------------------ //
 			XmlObject.Element("entry").Add( createXmlWithMembers( "source-user", this.SourceUser, true ));      // Source User
-			XmlObject.Element("entry").Add( createXmlWithMembers( "hip-profiles", this.HipProfile, true ));     // Hip Profiles
-			// ------------------------------------------------------------------------------------------------ //
-
-
-			// -------------------------- Applications, Services, and URL Category --------------------------- //
+			XmlObject.Element("entry").Add( createXmlWithMembers( "category", this.UrlCategory, true ));       // Url Category
 			XmlObject.Element("entry").Add( createXmlWithMembers( "application", this.Application, true ));    // Applications
 			XmlObject.Element("entry").Add( createXmlWithMembers( "service", this.Service, true ));            // Services
-			XmlObject.Element("entry").Add( createXmlWithMembers( "category", this.UrlCategory, true ));       // Url Category
-			// ----------------------------------------------------------------------------------------------- //
+			XmlObject.Element("entry").Add( createXmlWithMembers( "hip-profiles", this.HipProfile, true ));     // Hip Profiles
 
-
-			// ------------------------------------- Address Negation ------------------------------------- //
-			XmlObject.Element("entry").Add( createXmlBool( "negate-source", this.SourceNegate ));			      // Source Negate
-			XmlObject.Element("entry").Add( createXmlBool( "negate-destination", this.DestinationNegate ));	// Destination Negate
-			// -------------------------------------------------------------------------------------------- //
-
-			
 			// ----------------------------------- Action ----------------------------------- //
 			XElement xmlAction = new XElement("action");
 			if (this.Allow) { xmlAction.Value = "allow"; } 																		// Allow
@@ -466,6 +525,35 @@ namespace PowerAlto {
 			XmlObject.Element("entry").Add(xmlAction);
 			// ------------------------------------------------------------------------------ //
 
+			XmlObject.Element("entry").Add( createXmlBool( "log-start", this.LogAtSessionStart));				  				// Log At Start
+			XmlObject.Element("entry").Add( createXmlBool( "log-end", this.LogAtSessionEnd));					  					// Log At End
+
+			// ------------------------------------- Address Negation ------------------------------------- //
+			XmlObject.Element("entry").Add( createXmlBool( "negate-source", this.SourceNegate ));			      // Source Negate
+			XmlObject.Element("entry").Add( createXmlBool( "negate-destination", this.DestinationNegate ));	// Destination Negate
+			// -------------------------------------------------------------------------------------------- //
+
+			// ---------------------------------- Disabled ---------------------------------- //
+			XmlObject.Element("entry").Add( createXmlBool( "disabled", this.Disabled));
+
+			XmlObject.Element("entry").Add( createXmlWithoutMembers( "log-setting", this.LogForwarding));		  		// Log Forwarding
+			XmlObject.Element("entry").Add( createXmlWithoutMembers( "schedule", this.Schedule));				  				// Schedule
+			XmlObject.Element("entry").Add( createXmlWithMembers( "tag", this.Tags ));				            // Tags
+
+			// Set Qos Marking
+			if (!(String.IsNullOrEmpty(this.QosMarking)) && !(String.IsNullOrEmpty(this.QosType))) {
+				XElement QosXml = new XElement("qos", new XElement( "marking" ));
+				
+				if (this.QosType == "ip-dscp") {
+					XElement QosMarkingXml = new XElement("ip-dscp",this.QosMarking);
+					QosXml.Element("marking").Add(QosMarkingXml);
+				} else {
+					XElement QosMarkingXml = new XElement("ip-precedence",this.QosMarking);
+					QosXml.Element("marking").Add(QosMarkingXml);
+				}
+				
+				XmlObject.Element("entry").Add(QosXml);
+			}
 
 			// ------------------------------ Security Profiles ----------------------------- //
 			if (this.ProfileExists) {
@@ -492,70 +580,23 @@ namespace PowerAlto {
 			}
 			// ------------------------------------------------------------------------------ //
 
+			XmlObject.Element("entry").Add( createXmlWithoutMembers( "description", this.Description ));	// Description
 
-			// -------------------------------- Log Settings -------------------------------- //
-			XmlObject.Element("entry").Add( createXmlBool( "log-start", this.LogAtSessionStart));				  				// Log At Start
-			XmlObject.Element("entry").Add( createXmlBool( "log-end", this.LogAtSessionEnd));					  					// Log At End
-			XmlObject.Element("entry").Add( createXmlWithoutMembers( "log-setting", this.LogForwarding));		  		// Log Forwarding
-			// ------------------------------------------------------------------------------ //
-
-
-			// ----------------------------- Schedule and DSRI ------------------------------ //
-			XmlObject.Element("entry").Add( createXmlWithoutMembers( "schedule", this.Schedule));				  				// Schedule
-			// ------------------------------------------------------------------------------ //
-
-			// ---------------------------------- Disabled ---------------------------------- //
-			XmlObject.Element("entry").Add( createXmlBool( "disabled", this.Disabled));
-
-			// Set Disable Server Response Inspection
-			XElement xmlDisableSRI = new XElement("option",
-				createXmlBool( "disable-server-response-inspection", this.DisableSRI )
-			);
-
-			XmlObject.Element("entry").Add(xmlDisableSRI);
-
-
-			
-			// Set Qos Marking
-			if (!(String.IsNullOrEmpty(this.QosMarking)) && !(String.IsNullOrEmpty(this.QosType))) {
-				XElement QosXml = new XElement("qos", new XElement( "marking" ));
-				
-				if (this.QosType == "dscp") {
-					XElement QosMarkingXml = new XElement("ip-dscp",this.QosMarking);
-					QosXml.Element("marking").Add(QosMarkingXml);
-				} else {
-					XElement QosMarkingXml = new XElement("ip-precedence",this.QosMarking);
-					QosXml.Element("marking").Add(QosMarkingXml);
-				}
-				
-				XmlObject.Element("entry").Add(QosXml);
-			}
-			
 			return XmlObject.Element("entry");
 	  }
 
 		public string PrintPrettyXml() {
 			return Xml().ToString();
 		}
-		
-		/*
-		private string paNameMatch (string Name) {
-			string namePattern =  @"^[a-zA-Z0-9\-_\.]+$";
-			Regex nameRx = new Regex(namePattern);
-			Match nameMatch = nameRx.Match(Name);
-			if (nameMatch.Success) {
-				return Name;
-			} else {
-				throw new System.ArgumentException("Value can only contain alphanumeric, hyphens, underscores, or periods.");
-			}
-		}
-		*/
 
 		public string PrintPlainXml() {
-			//string plainXml = Xml().ToString(SaveOptions.DisableFormatting);
+			string plainXml = Xml().ToString(SaveOptions.DisableFormatting);
+			string entryPattern = @"^<.+?>(.+)</entry>$";
+			Regex entryRx = new Regex(entryPattern);
+			Match entryMatch = entryRx.Match(plainXml);
+			return entryMatch.Groups[1].Value;
 
-			//string entryPattern = @"^<.+?>(.+)</entry>$"
-			return this.Xml().ToString(SaveOptions.DisableFormatting);
+//			return this.Xml().ToString(SaveOptions.DisableFormatting);
 
 		}
 		

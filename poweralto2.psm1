@@ -446,7 +446,7 @@ function Set-PaSecurityRule {
     )
 
     $Xpath  = "/config/devices/entry/vsys/entry/rulebase/security"
-    $Xpath += "/entry[@name='$Name']"
+    $Xpath += "/entry[@name=`'$Name`'`]"
 
     $Action = "set"
 
@@ -481,6 +481,10 @@ function Set-PaConfig {
                      action  = $Action
                      element = $Element }
     
+    Write-Debug "xpath: $Xpath"
+    Write-Debug "action: $Action"
+    Write-Debug "element: $Element"
+
     $QueryString = HelperCreateQueryString $QueryTable
     Write-Debug $QueryString
     $Url         = $PaDeviceObject.UrlBuilder($QueryString)
