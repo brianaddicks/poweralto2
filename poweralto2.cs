@@ -352,6 +352,7 @@ namespace PowerAlto {
 			set {
 				if (String.IsNullOrEmpty(value)) {
 					this.qosType = null;
+					this.QosMarking = null;
 				} else {
 					string lowerValue = value.ToLower();
 					this.qosType = lowerValue;
