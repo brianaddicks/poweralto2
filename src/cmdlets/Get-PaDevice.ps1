@@ -105,7 +105,8 @@ function Get-PaDevice {
 		try   { $QueryObject = HelperHTTPQuery $url -AsXML } `
         catch {	throw "Error performing HTTP query"	       }
 
-		$Data = $QueryObject.data.response.result.system
+        $Data = HelperCheckPaError $QueryObject
+		$Data = $Data.system
 
         $PaDeviceObject.Name            = $Data.hostname
         $PaDeviceObject.Model           = $Data.model
