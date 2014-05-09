@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
@@ -26,6 +27,17 @@ namespace PowerAlto {
 		}
 	}
 */
+  public class HttpQueryReturnObject {
+    public HttpStatusCode Statuscode;
+    public string DetailedError;
+    public XmlDocument Data;
+    public string RawData;
+    public int HttpStatusCode {
+      get {
+        return (int)this.Statuscode;
+      }
+    }
+  }
 	public class PaDevice {
 		// can we rewrite the helper functions as methods in this class?
 		
@@ -136,6 +148,57 @@ namespace PowerAlto {
 		
 		//Holds the raw result of the last query
 		//Would like to convert this to emulate UrlHistory, but I think we need to get the HttpQuery helper as a method to PaDevice first
-		
+
+    public HttpQueryReturnObject HttpQuery(string Url, bool AsXml = true) {
+      // this works. there's some logic missing from the original powershell version of this
+      // that may or may not be important (it was error handling of some flavor)
+      // also, all requests should not be treated as XML for this to be more generic
+      // (the powershell version had an "-asxml" flag to handle this)
+
+      HttpWebResponse Response = null;
+      HttpStatusCode StatusCode = new HttpStatusCode();
+
+      try {
+        HttpWebRequest Request = WebRequest.Create(Url) as HttpWebRequest;
+
+        //if (Response.ContentLength > 0) {
+
+        try {
+          Response = Request.GetResponse() as HttpWebResponse;
+          StatusCode = Response.StatusCode;
+        } catch (WebException we) {
+          StatusCode = ((HttpWebResponse)we.Response).StatusCode;
+        }
+
+        string DetailedError = Response.GetResponseHeader("X-Detailed-Error");
+         // }
+
+      } catch {
+        throw new HttpException("httperror");
+      }
+
+      if (Response.StatusCode.ToString() == "OK") {
+        StreamReader Reader = new StreamReader(Response.GetResponseStream());
+        string Result = Reader.ReadToEnd();
+        XmlDocument XResult = new XmlDocument();
+
+        if (AsXml) {
+          XResult.LoadXml(Result);
+        }
+
+        Reader.Close();
+        Response.Close();
+
+        HttpQueryReturnObject ReturnObject = new HttpQueryReturnObject();
+        ReturnObject.Statuscode = StatusCode;
+        if (AsXml) { ReturnObject.Data = XResult; }
+        ReturnObject.RawData = Result;
+        return ReturnObject;
+
+      } else {
+
+        throw new HttpException("httperror");
+      }
+    }		
 	}
 }

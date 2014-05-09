@@ -1,9 +1,10 @@
 ﻿$VerbosePreference = "Continue"
 & ".\build\build.ps1"
 $Device = "pegasus.addicks.us"
-$ApiKey = "LUFRPT1PR2JtSDl5M2tjTktBeTkyaGZMTURTTU9BZm89OFA0Rk1WMS8zZGtKN0FmVjRqQ0lxVHlRcmgvSVRoUnlzMW5OckNhVEZUZz0="
+$ApiKey = "LUFRPT1SanJaQVpiNEg4TnBkNGVpTmRpZTRIamR4OUE9Q2lMTUJGREJXOCs3SjBTbzEyVSt6UT09"
 ipmo C:\dev\poweralto2\poweralto2.psm1
 Get-PaDevice $Device $ApiKey
+<#
 $global:TestRule                    = new-object PowerAlto.SecurityRule
 $global:TestRule.Name               = "newrule"
 $global:TestRule.Description        = "this is a description"
@@ -29,3 +30,4 @@ $global:TestRule.QosType            = "ip-dscp"
 $global:TestRule.QosMarking         = "af11"
 $global:TestRule.DisableSRI         = $False
 $global:TestRule.Disabled           = $True
+#>
