@@ -149,6 +149,32 @@ namespace PowerAlto {
 		//Holds the raw result of the last query
 		//Would like to convert this to emulate UrlHistory, but I think we need to get the HttpQuery helper as a method to PaDevice first
 
+    private Stack<string> rawqueryhistory = new Stack<string>();
+
+    public string[] RawQueryHistory {
+      get {
+        return this.rawqueryhistory.ToArray();
+      }
+    }
+    
+    public void FlushRawQueryHistory () {
+      this.rawqueryhistory.Clear();
+    }
+
+    /*
+    private Stack<XmlDocument> queryhistory = new Stack<XmlDocument>();
+
+    public string[] QueryHistory {
+      get {
+        return this.queryhistory.ToArray();
+      }
+    }
+    
+    public void FlushQueryHistory () {
+      this.queryhistory.Clear();
+    }
+    */
+
     public HttpQueryReturnObject HttpQuery(string Url, bool AsXml = true) {
       // this works. there's some logic missing from the original powershell version of this
       // that may or may not be important (it was error handling of some flavor)
@@ -193,6 +219,10 @@ namespace PowerAlto {
         ReturnObject.Statuscode = StatusCode;
         if (AsXml) { ReturnObject.Data = XResult; }
         ReturnObject.RawData = Result;
+        
+        this.rawqueryhistory.Push(Result);
+        //this.queryhistory.Push(XResult);
+
         return ReturnObject;
 
       } else {

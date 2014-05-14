@@ -102,8 +102,8 @@ function Get-PaDevice {
         $QueryString = HelperCreateQueryString $QueryStringTable
 		$url         = $PaDeviceObject.UrlBuilder($QueryString)
 
-		try   { $QueryObject = HelperHTTPQuery $url -AsXML } `
-        catch {	throw "Error performing HTTP query"	       }
+		try   { $QueryObject = $PaDeviceObject.HttpQuery($url) } `
+        catch {	throw "Error performing HTTP query"	           }
 
         $Data = HelperCheckPaError $QueryObject
 		$Data = $Data.system
