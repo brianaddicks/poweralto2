@@ -5,7 +5,7 @@ function Get-PaConfig {
 
         [Parameter(Mandatory=$False,Position=1)]
         [ValidateSet("get","show")]
-        [string]$Action
+        [string]$Action = "show"
     )
 
     HelperCheckPaConnection
@@ -15,8 +15,8 @@ function Get-PaConfig {
                      action = $Action  }
     
     $QueryString = HelperCreateQueryString $QueryTable
-    $Url         = $PaDeviceObject.UrlBuilder($QueryString)
-    $Response    = HelperHttpQuery $Url -AsXML
+    $Url         = $global:PaDeviceObject.UrlBuilder($QueryString)
+    $Response    = $global:PaDeviceObject.HttpQuery($url)
 
     return HelperCheckPaError $Response
 }
