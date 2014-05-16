@@ -1,5 +1,5 @@
 ﻿$VerbosePreference = "Continue"
-& ".\build\build.ps1"
+& ".\build.ps1"
 $Device = "pegasus.addicks.us"
 $ApiKey = "LUFRPT1SanJaQVpiNEg4TnBkNGVpTmRpZTRIamR4OUE9Q2lMTUJGREJXOCs3SjBTbzEyVSt6UT09"
 ipmo C:\dev\poweralto2\poweralto2.psm1
