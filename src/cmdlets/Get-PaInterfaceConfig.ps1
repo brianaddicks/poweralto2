@@ -6,8 +6,24 @@
         [string]$Name,
 
         [Parameter(Mandatory=$False)]
+        [switch]$Ethernet,
+
+        [Parameter(Mandatory=$False)]
+        [switch]$Loopback,
+
+        [Parameter(Mandatory=$False)]
+        [switch]$Vlan,
+
+        [Parameter(Mandatory=$False)]
+        [switch]$Tunnel,
+
+        [Parameter(Mandatory=$False)]
         [switch]$Candidate
     )
+
+    if ($Ethernet -or $Loopback -or $Vlan -or $Tunnel) {
+        $TypeSpecified = $True
+    }
 
     if ($Candidate) { $Action = "get"; Throw "not supported yet"  } `
                else { $Action = "show" }
@@ -114,15 +130,17 @@
         ###############################################################################
         # Ethernet Interfaces
 
-        Write-Verbose '## Ethernet Interfaces ##'
-        foreach ($e in $ResponseData.interface.ethernet.entry) {
-            if ($e.layer3 -or ($e.firstchild.name -eq 'tap')) {
-                Write-Verbose $e.name
-                $InterfaceObjects += ProcessInterface $e
-                if ($e.layer3.units) {
-                    foreach ($u in $e.layer3.units.entry) {
-                        Write-Verbose $u.name
-                        $InterfaceObjects += ProcessInterface $u
+        if ($Ethernet -or (!($TypeSpecified))) {
+            Write-Verbose '## Ethernet Interfaces ##'
+            foreach ($e in $ResponseData.interface.ethernet.entry) {
+                if ($e.layer3 -or ($e.firstchild.name -eq 'tap')) {
+                    Write-Verbose $e.name
+                    $InterfaceObjects += ProcessInterface $e
+                    if ($e.layer3.units) {
+                        foreach ($u in $e.layer3.units.entry) {
+                            Write-Verbose $u.name
+                            $InterfaceObjects += ProcessInterface $u
+                        }
                     }
                 }
             }
@@ -131,14 +149,16 @@
         ###############################################################################
         # Loopback Interfaces
 
-        Write-Verbose '## Loopback Interfaces ##'
-        foreach ($e in $ResponseData.interface.loopback) {
-            Write-Verbose 'loopback'
-            $InterfaceObjects += ProcessInterface $e
-            if ($e.units) {
-                foreach ($u in $e.units.entry) {
-                    Write-Verbose $u.name
-                    $InterfaceObjects += ProcessInterface $u
+        if ($Loopback -or (!($TypeSpecified))) {
+            Write-Verbose '## Loopback Interfaces ##'
+            foreach ($e in $ResponseData.interface.loopback) {
+                Write-Verbose 'loopback'
+                $InterfaceObjects += ProcessInterface $e
+                if ($e.units) {
+                    foreach ($u in $e.units.entry) {
+                        Write-Verbose $u.name
+                        $InterfaceObjects += ProcessInterface $u
+                    }
                 }
             }
         }
@@ -146,14 +166,16 @@
         ###############################################################################
         # Vlan Interfaces
 
-        Write-Verbose '## Vlan Interfaces ##'
-        foreach ($e in $ResponseData.interface.vlan) {
-            $InterfaceObjects += ProcessInterface $e
-            Write-Verbose 'vlan'
-            if ($e.units) {
-                foreach ($u in $e.units.entry) {
-                    Write-Verbose $u.name
-                    $InterfaceObjects += ProcessInterface $u
+        if ($Vlan -or (!($TypeSpecified))) {
+            Write-Verbose '## Vlan Interfaces ##'
+            foreach ($e in $ResponseData.interface.vlan) {
+                $InterfaceObjects += ProcessInterface $e
+                Write-Verbose 'vlan'
+                if ($e.units) {
+                    foreach ($u in $e.units.entry) {
+                        Write-Verbose $u.name
+                        $InterfaceObjects += ProcessInterface $u
+                    }
                 }
             }
         }
@@ -161,14 +183,16 @@
         ###############################################################################
         # Tunnel Interfaces
 
-        Write-Verbose '## Tunnel Interfaces ##'
-        foreach ($e in $ResponseData.interface.tunnel) {
-            Write-Verbose "tunnel"
-            $InterfaceObjects += ProcessInterface $e
-            if ($e.units) {
-                foreach ($u in $e.units.entry) {
-                    Write-Verbose $u.name
-                    $InterfaceObjects += ProcessInterface $u
+        if ($Tunnel -or (!($TypeSpecified))) {
+            Write-Verbose '## Tunnel Interfaces ##'
+            foreach ($e in $ResponseData.interface.tunnel) {
+                Write-Verbose "tunnel"
+                $InterfaceObjects += ProcessInterface $e
+                if ($e.units) {
+                    foreach ($u in $e.units.entry) {
+                        Write-Verbose $u.name
+                        $InterfaceObjects += ProcessInterface $u
+                    }
                 }
             }
         }
