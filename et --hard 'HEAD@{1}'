@@ -1,0 +1,82 @@
+[33m640cddd[m HEAD@{0}: reset: moving to HEAD^
+[33m7516fad[m HEAD@{1}: commit: added switches to get specific types of interfaces
+[33m640cddd[m HEAD@{2}: commit: First pass for Get-PaInterfaceConfig
+[33ma8baaf8[m HEAD@{3}: commit: First pass for Get-PaInterfaceConfig
+[33m9b1574e[m HEAD@{4}: commit: started work on Get-PaInterface
+[33m86fdc69[m HEAD@{5}: commit: started work on Get-PaInterface
+[33m36b9b32[m HEAD@{6}: commit: don't remember!
+[33m55a50f1[m HEAD@{7}: commit: don't remember!
+[33m4d2f2f1[m HEAD@{8}: commit: change build ps1 name
+[33mb7b2e52[m HEAD@{9}: commit: change build ps1 name
+[33me43c653[m HEAD@{10}: commit: updated build script
+[33meeab4f8[m HEAD@{11}: commit: got separate cs files working
+[33m9bba3e8[m HEAD@{12}: commit: split cs files and started on validators class
+[33me4d71ed[m HEAD@{13}: commit: split cs files and started on validators class
+[33mda39ccd[m HEAD@{14}: commit: Added function to expand inline lists https://app.asana.com/0/12045541839782/12045541839784
+[33mf2be3b4[m HEAD@{15}: commit: Added HttpQuery Method to PaDevice https://app.asana.com/0/12204868939293/12204868939293
+[33mcf5b151[m HEAD@{16}: commit: Corrected error handling for Get-PaDevice
+[33m8bdb36a[m HEAD@{17}: commit: removed old source files
+[33m5aab86c[m HEAD@{18}: commit: updated build script to poweralto.psm1
+[33mb95878e[m HEAD@{19}: commit: Added src dir with functions/helpers/csharp broken up for easier code managing, created build.ps1 to smash them back together
+[33m1790dc7[m HEAD@{20}: commit: completed validation for qostype
+[33m6b64b18[m HEAD@{21}: commit: adding validation to qostype
+[33m28cb0d5[m HEAD@{22}: commit: added some validation to poweralto.securityrule
+[33m27e0c7a[m HEAD@{23}: commit: split cs file
+[33m9b08e97[m HEAD@{24}: commit: added Get-PaService
+[33m600cb63[m HEAD@{25}: commit: added PowerAlto.Service object
+[33m6bea699[m HEAD@{26}: commit: completed first pass of get-paaddressobject
+[33mda68465[m HEAD@{27}: commit: added disabled to pasecurityrule object and cmdlet
+[33mb58ef31[m HEAD@{28}: commit: finished first pass at get-pazone
+[33m31413ac[m HEAD@{29}: commit: started on get-pazone, just type and interfaces so far
+[33m029dae5[m HEAD@{30}: commit: created zone object
+[33m0d20f9a[m HEAD@{31}: commit: added addressobject object
+[33m6318336[m HEAD@{32}: commit: functionize setting profiles with error checking
+[33mf3b61c2[m HEAD@{33}: commit: functionizing xml outpute
+[33m1cad36b[m HEAD@{34}: commit: functionize xml building
+[33ma350f6b[m HEAD@{35}: commit: added schedule and disablesri printclioutput
+[33m0effbf3[m HEAD@{36}: commit: added log settings to PrintCliOutput
+[33mb0fb113[m HEAD@{37}: commit: added security profile groups to PrintCliOutput()
+[33mcaa31f3[m HEAD@{38}: commit: added a bunch of stuff to printclioutput()
+[33mc021676[m HEAD@{39}: commit: add private createCliWithMembers class
+[33m16c682e[m HEAD@{40}: commit: added trailing ] to PrintCliOutput() applications
+[33m6f5af5a[m HEAD@{41}: commit: added applicationto PrintCliOutput()
+[33mfd6b6d5[m HEAD@{42}: commit: added NegateDestination to PrintCliOutput()
+[33m00291b4[m HEAD@{43}: commit: added Destination Addresses to PrintCliOutput()
+[33medd4e3a[m HEAD@{44}: commit: added Destination Zones to PrintCliOutput()
+[33m1d58bff[m HEAD@{45}: commit: added HipProfiles to PrintCliOutput()
+[33ma2150b3[m HEAD@{46}: commit: added SourceNegate and SourceUser to PrintCliOutput()
+[33mc3eddf0[m HEAD@{47}: commit: added Description, Tags, SourceZones, and Source Addresses to PrintCliOutput()
+[33m53393a7[m HEAD@{48}: commit: added PrintCliOutput() to PaDevice
+[33m8e6f6c9[m HEAD@{49}: commit: Get-PaSecurityRule now returns a PowerAlto.SecurityRule Object
+[33m836f0b5[m HEAD@{50}: commit: added HelperGetPropertyMembers
+[33mc5b5465[m HEAD@{51}: commit: added HelperGetPropertyMembers
+[33m38f61c2[m HEAD@{52}: commit: http helper mostly working
+[33m9b89041[m HEAD@{53}: commit: first go at Helper HTTP Query added as PaFirewall.HttpQuery()
+[33m06b5399[m HEAD@{54}: commit: started on c# module
+[33m7b5aa68[m HEAD@{55}: commit: started on c# module
+[33m69eb284[m HEAD@{56}: commit: added qosmarking
+[33maff0e81[m HEAD@{57}: commit: added logforwarding/schedule
+[33ma2651d6[m HEAD@{58}: commit: added log at start/end
+[33m9d1dac0[m HEAD@{59}: commit: added data filtering profile
+[33m59904bf[m HEAD@{60}: commit: added file blocking profile
+[33m1c4222f[m HEAD@{61}: commit: added urlfiltering profile
+[33mbacac68[m HEAD@{62}: commit: added antispyware profiles
+[33md58d45b[m HEAD@{63}: commit: got individual profiles starting to work, just av added
+[33m7d52505[m HEAD@{64}: commit: updated profilegroup to set isgroup
+[33m783fa8a[m HEAD@{65}: commit: added profile groups
+[33mc635c73[m HEAD@{66}: commit: added UrlCategory
+[33m6a870ca[m HEAD@{67}: commit: added more properties to printoutput
+[33m03f07f7[m HEAD@{68}: commit: added sourcenegate
+[33m67dc798[m HEAD@{69}: commit: added SourceAddress to PrintOutput() on PowerAlto.SecurityRule
+[33mf367006[m HEAD@{70}: commit: add fakeroot to printoutput() so we can use the builtin xml functions
+[33mcb82746[m HEAD@{71}: commit: Attempting to add tags to SecurityRule PrintOutput()
+[33mc3e8da7[m HEAD@{72}: commit: adding PowerAlto.SecurityRule
+[33me2f3eec[m HEAD@{73}: commit: added Get-PaSecurtyRule
+[33m19c6f44[m HEAD@{74}: commit: added HelperCheckPaConnection, throws error if Get-PaDevice hasn't been used yet
+[33m530dd3c[m HEAD@{75}: commit: change xpath for get-paconfig to non-mandatory, defaults to /config
+[33me713a4b[m HEAD@{76}: commit: added Get-PaConfig
+[33m2b43500[m HEAD@{77}: commit: first pass at Get-PaDevice
+[33m06fca63[m HEAD@{78}: commit: dynamic path for cs file
+[33mb68ff9f[m HEAD@{79}: commit: removed absolute path from type definition
+[33mb64ee7a[m HEAD@{80}: commit: working on get-padevice
+[33m530914a[m HEAD@{81}: clone: from git@github.com:brianaddicks/poweralto2.git
