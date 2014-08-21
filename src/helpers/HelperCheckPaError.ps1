@@ -7,6 +7,11 @@ function HelperCheckPaError {
 
     $Status = $Response.data.response.status
     Write-Verbose $Status
+
+    if ($Response.data.response.result.error) {
+        $ErrorMessage = $Response.data.response.result.error
+    }
+
     if ($Status -eq "error") {
         if ($Response.data.response.code) {
             $ErrorMessage  = "Error Code $($Response.data.response.code): "
@@ -20,6 +25,8 @@ function HelperCheckPaError {
             Write-Verbose "Message: $($Response.data.response.msg.line)"
             $ErrorMessage = $Response.data.response.msg
         }
+    }
+    if ($ErrorMessage) {
         Throw "$ErrorMessage`."
     } else {
         return $Response.data.response.result
