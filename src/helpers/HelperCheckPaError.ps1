@@ -14,6 +14,8 @@ function HelperCheckPaError {
         } elseif ($Response.data.response.msg.line) {
             Write-Verbose "Line is: $($Response.data.response.msg.line)"
             $ErrorMessage = $Response.data.response.msg.line
+        } elseif ($Response.error) {
+            $ErrorMessage = $Response.error
         } else {
             Write-Verbose "Message: $($Response.data.response.msg.line)"
             $ErrorMessage = $Response.data.response.msg
