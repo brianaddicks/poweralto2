@@ -21,6 +21,7 @@ $CSharpHeader = @'
 ## Custom Objects Create in C-Sharp
 ###############################################################################
 
+$TargetDllPath = (Split-Path -parent $MyInvocation.MyCommand.Path) + "helper.dll"
 
 '@
 
@@ -67,6 +68,7 @@ $c = 0
 foreach ($l in $(ls $CsPath)) {
     $Contents      = [System.IO.File]::ReadAllText($l.FullName)
     $DllPath       = $ScriptPath + '\helper.dll'
+    $DllPath       = '.\helper.dll'
     $Output       += $FunctionHeader
     $Output       += $l.BaseName
     $Output       += "`r`n`r`n"
@@ -77,11 +79,11 @@ Add-Type -ReferencedAssemblies @(
 	([System.Reflection.Assembly]::LoadWithPartialName("System.Xml")).Location,
 	([System.Reflection.Assembly]::LoadWithPartialName("System.Web")).Location,
 	([System.Reflection.Assembly]::LoadWithPartialName("System.Xml.Linq")).Location
-	) -OutputAssembly $DllPath -OutputType Library -TypeDefinition @'
+	) -OutputAssembly `$TargetDllPath -OutputType Library -TypeDefinition @'
 $Contents
 '@
 
-[System.Reflection.Assembly]::LoadFile("$DllPath")
+[System.Reflection.Assembly]::LoadFile("`$TargetDllPath")
 "@
         $Output += "`r`n`r`n"
     } else {
