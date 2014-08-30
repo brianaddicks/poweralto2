@@ -2,7 +2,7 @@
 & ".\buildmodule.ps1"
 $Device = "pegasus.addicks.us"
 $ApiKey = "LUFRPT1SanJaQVpiNEg4TnBkNGVpTmRpZTRIamR4OUE9Q2lMTUJGREJXOCs3SjBTbzEyVSt6UT09"
-ipmo C:\dev\poweralto2\poweralto2.psm1
+ipmo C:\dev\poweralto2\poweralto2.psd1
 Get-PaDevice $Device $ApiKey
 <#
 $global:TestRule                    = new-object PowerAlto.SecurityRule
@@ -31,3 +31,8 @@ $global:TestRule.QosMarking         = "af11"
 $global:TestRule.DisableSRI         = $False
 $global:TestRule.Disabled           = $True
 #>
+
+cp C:\dev\poweralto2\PowerAlto2.psm1 \\athena2\c$\_strap\poweralto2
+#cp C:\dev\poweralto2\PowerAlto2.cs \\athena2\c$\_strap\poweralto2
+cp C:\dev\poweralto2\PowerAlto2.dll \\athena2\c$\_strap\poweralto2
+cp C:\dev\poweralto2\PowerAlto2.psd1 \\athena2\c$\_strap\poweralto2

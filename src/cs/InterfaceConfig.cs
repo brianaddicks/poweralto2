@@ -12,7 +12,7 @@ using System.Xml.Linq;
 using System.Text.RegularExpressions;
 
 namespace PowerAlto {
-public class InterfaceConfig {
+  public class InterfaceConfig {
     public string Name { get; set; }
     
     public bool IsDhcp { get; set; }

@@ -3,11 +3,11 @@ using System.Text.RegularExpressions;
 
 namespace PowerAlto {
   public class AddressObject {
-  	Validator Validator = new Validator();
+  	//Validator Validator = new Validator();
 
-    private string name;
-    public string Name { get { return this.name; }
-                         set { this.name = Validator.AlphaNum( value ); } }
+    //private string name;
+    public string Name { get; set; }
+                         //set { this.name = Validator.AlphaNum( value ); } }
 
     public string Description { get; set; }
 

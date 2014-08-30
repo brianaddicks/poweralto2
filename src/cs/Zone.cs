@@ -12,7 +12,7 @@ using System.Xml.Linq;
 using System.Text.RegularExpressions;
 
 namespace PowerAlto {
-public class Zone {
+  public class Zone {
     private string paNameMatch (string Name) {
       string namePattern =  @"^[a-zA-Z0-9\-_\.]+$";
       Regex nameRx = new Regex(namePattern);
