@@ -14,7 +14,7 @@ $CsOutputFile    = $ScriptPath + "\" + "PowerAlto2.cs"
 # Create Manifest
 $ManifestParams = @{ Path = $ManifestFile
                      ModuleVersion = '2.0'
-                     RequiredAssemblies = 'PowerAlto2.dll'
+                     RequiredAssemblies = @('PowerAlto2.dll','System.Web')
                      Author             = 'Brian Addicks'
                      RootModule         = 'PowerAlto2.psm1'
                      PowerShellVersion  = '4.0' }

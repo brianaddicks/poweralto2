@@ -96,11 +96,30 @@ function Get-PaDevice {
 
     PROCESS {
         
+        if (!($ApiKey)) {
+            $QueryStringTable = @{ type     = "keygen"
+                                   user     = $UserName
+                                   password = $Password }
+
+            $QueryString = HelperCreateQueryString $QueryStringTable
+            $QueryString
+		    $url         = $PaDeviceObject.UrlBuilder($QueryString)
+            $url
+
+		    try   { $QueryObject = $PaDeviceObject.HttpQuery($url) } `
+            catch {	throw "Error performing HTTP query"	           }
+
+            $Data                  = HelperCheckPaError $QueryObject
+            $PaDeviceObject.ApiKey = $Data.key
+        }
+        
         $QueryStringTable = @{ type = "op"
                                cmd  = "<show><system><info></info></system></show>" }
 
         $QueryString = HelperCreateQueryString $QueryStringTable
+        $QueryString
 		$url         = $PaDeviceObject.UrlBuilder($QueryString)
+        $url
 
 		try   { $QueryObject = $PaDeviceObject.HttpQuery($url) } `
         catch {	throw "Error performing HTTP query"	           }
