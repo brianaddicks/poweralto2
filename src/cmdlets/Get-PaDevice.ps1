@@ -102,9 +102,7 @@ function Get-PaDevice {
                                    password = $Password }
 
             $QueryString = HelperCreateQueryString $QueryStringTable
-            $QueryString
 		    $url         = $PaDeviceObject.UrlBuilder($QueryString)
-            $url
 
 		    try   { $QueryObject = $PaDeviceObject.HttpQuery($url) } `
             catch {	throw "Error performing HTTP query"	           }
@@ -117,9 +115,7 @@ function Get-PaDevice {
                                cmd  = "<show><system><info></info></system></show>" }
 
         $QueryString = HelperCreateQueryString $QueryStringTable
-        $QueryString
 		$url         = $PaDeviceObject.UrlBuilder($QueryString)
-        $url
 
 		try   { $QueryObject = $PaDeviceObject.HttpQuery($url) } `
         catch {	throw "Error performing HTTP query"	           }
