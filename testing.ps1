@@ -36,3 +36,5 @@ cp C:\dev\poweralto2\PowerAlto2.psm1 \\athena2\c$\_strap\poweralto2
 #cp C:\dev\poweralto2\PowerAlto2.cs \\athena2\c$\_strap\poweralto2
 cp C:\dev\poweralto2\PowerAlto2.dll \\athena2\c$\_strap\poweralto2
 cp C:\dev\poweralto2\PowerAlto2.psd1 \\athena2\c$\_strap\poweralto2
+
+get-padiskspace
