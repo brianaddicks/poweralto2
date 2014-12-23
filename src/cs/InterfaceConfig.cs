@@ -14,6 +14,7 @@ using System.Text.RegularExpressions;
 namespace PowerAlto {
   public class InterfaceConfig {
     public string Name { get; set; }
+    public string AggregateGroup { get; set; }
     
     public bool IsDhcp { get; set; }
     public bool CreateDefaultRoute { get; set; }

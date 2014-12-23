@@ -1,7 +1,8 @@
 ﻿$VerbosePreference = "Continue"
 & ".\buildmodule.ps1"
-$Device = "pegasus.addicks.us"
+$Device = "10.10.72.2"
 $ApiKey = "LUFRPT1SanJaQVpiNEg4TnBkNGVpTmRpZTRIamR4OUE9Q2lMTUJGREJXOCs3SjBTbzEyVSt6UT09"
+#$ApiKey = "LUFRPT1XODhhTmV5M3dXMHBYQ2o1bnNUMnc1SEtSb1U9c3JuMTV2Um8yNlRPaTI3UlV1Y2xZSkRQODBLVEIwUVNIbDhtTENNYWhZdz0="
 ipmo C:\dev\poweralto2\poweralto2.psd1
 Get-PaDevice $Device $ApiKey
 <#
@@ -33,7 +34,6 @@ $global:TestRule.Disabled           = $True
 #>
 
 cp C:\dev\poweralto2\PowerAlto2.psm1 \\athena2\c$\_strap\poweralto2
-#cp C:\dev\poweralto2\PowerAlto2.cs \\athena2\c$\_strap\poweralto2
 cp C:\dev\poweralto2\PowerAlto2.dll \\athena2\c$\_strap\poweralto2
 cp C:\dev\poweralto2\PowerAlto2.psd1 \\athena2\c$\_strap\poweralto2
 

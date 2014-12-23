@@ -17,6 +17,7 @@ function Get-PaConfig {
     $QueryString = HelperCreateQueryString $QueryTable
     $Url         = $global:PaDeviceObject.UrlBuilder($QueryString)
     $Response    = $global:PaDeviceObject.HttpQuery($url)
+    $global:test2 = $Response
 
     return HelperCheckPaError $Response
 }

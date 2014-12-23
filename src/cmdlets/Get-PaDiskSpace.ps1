@@ -1,10 +1,7 @@
 ﻿function Get-PaDiskSpace {
     [CmdletBinding()]
-    <#Param (
-        [Parameter(Mandatory=$True,Position=0)]
-        [ValidatePattern('^(ethernet\d+\/\d+(\.\d+)?|(loopback|tunnel|vlan)(\.\d+)?)$')]
-        [string]$Name
-    )#>
+    Param (
+    )
 
     $Command = "<show><system><disk-space></disk-space></system></show>"
 

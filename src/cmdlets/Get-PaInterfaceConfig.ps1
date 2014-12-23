@@ -16,6 +16,9 @@
 
         [Parameter(Mandatory=$False)]
         [switch]$Tunnel,
+        
+        [Parameter(Mandatory=$False)]
+        [switch]$Aggregate,
 
         [Parameter(Mandatory=$False)]
         [switch]$Candidate
@@ -30,7 +33,7 @@
     
     $ElementName = "network/interface"
     $Xpath = "/config/devices/entry/$ElementName"
-    $InterfaceTypeRx = [regex] '(?<type>loopback|vlan|tunnel|ethernet)(?<num>\d+\/\d+|\.\d+)?(?<sub>\.\d+)?'
+    $InterfaceTypeRx = [regex] '(?<type>loopback|vlan|tunnel|ethernet|ae)(?<num>\d+\/\d+|\.\d+|\d+)?(?<sub>\.\d+)?'
 
     if ($Name) {
         $InterfaceMatch = $InterfaceTypeRx.Match($Name)
@@ -68,12 +71,13 @@
     $Global:test = $ResponseData
 
     function ProcessInterface ($entry) {
-        $interfaceObject             = New-Object PowerAlto.InterfaceConfig
-        $interfaceObject.Name        = $entry.name
-        $interfaceObject.Comment     = $entry.comment
-        $InterfaceObject.AdminSpeed  = $Entry.'link-speed'
-        $InterfaceObject.AdminDuplex = $Entry.'link-duplex'
-        $InterfaceObject.AdminState  = $Entry.'link-state'
+        $interfaceObject                = New-Object PowerAlto.InterfaceConfig
+        $interfaceObject.Name           = $entry.name
+        $interfaceObject.AggregateGroup = $entry.'aggregate-group'
+        $interfaceObject.Comment        = $entry.comment
+        $InterfaceObject.AdminSpeed     = $Entry.'link-speed'
+        $InterfaceObject.AdminDuplex    = $Entry.'link-duplex'
+        $InterfaceObject.AdminState     = $Entry.'link-state'
 
         if ($entry.layer3 -or ($entry.firstchild.name -eq 'tap')) {
             $interfaceObject.MgmtProfile    = $entry.layer3.'interface-management-profile'
@@ -133,7 +137,30 @@
         if ($Ethernet -or (!($TypeSpecified))) {
             Write-Verbose '## Ethernet Interfaces ##'
             foreach ($e in $ResponseData.interface.ethernet.entry) {
-                if ($e.layer3 -or ($e.firstchild.name -eq 'tap')) {
+                if (($e.layer3) -or `
+                    ($e.firstchild.name -eq 'tap') -or `
+                    ($e.'aggregate-group')) {
+
+                    Write-Verbose $e.name
+                    $InterfaceObjects += ProcessInterface $e
+                    if ($e.layer3.units) {
+                        foreach ($u in $e.layer3.units.entry) {
+                            Write-Verbose $u.name
+                            $InterfaceObjects += ProcessInterface $u
+                        }
+                    }
+                }
+            }
+        }
+
+        ###############################################################################
+        # Aggregate Interfaces
+
+        if ($Ethernet -or (!($TypeSpecified))) {
+            Write-Verbose '## Ethernet Interfaces ##'
+            foreach ($e in $ResponseData.interface.'aggregate-ethernet'.entry) {
+                if ($e.layer3) {
+
                     Write-Verbose $e.name
                     $InterfaceObjects += ProcessInterface $e
                     if ($e.layer3.units) {
