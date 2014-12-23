@@ -23,7 +23,7 @@ namespace PowerAlto {
 			return nodeXml;
 		}
     
-    protected XElement createXmlWithoutMembers( string XmlKeyword, string RuleProperty) {
+    protected XElement createXmlWithoutMembers( string XmlKeyword, string RuleProperty = null) {
 			if (!(String.IsNullOrEmpty(RuleProperty))) {
 				XElement nodeXml = new XElement(XmlKeyword,RuleProperty);
 				return nodeXml;
@@ -32,5 +32,17 @@ namespace PowerAlto {
 			}
 		}
     
+    protected string printPlainXml( XElement xml) {
+			string plainXml = xml.ToString(SaveOptions.DisableFormatting);
+/*			string entryPattern = @"^<.+?>(.+)</entry>$";
+			Regex entryRx = new Regex(entryPattern);
+			Match entryMatch = entryRx.Match(plainXml);
+      if (entryMatch.Success) {
+        return entryMatch.Groups[1].Value;
+      } else {
+*/
+        return plainXml;
+//      }
+		}
   }
 }
