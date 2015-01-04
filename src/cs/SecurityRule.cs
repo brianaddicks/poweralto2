@@ -33,13 +33,14 @@ namespace PowerAlto {
 		public List<string> Tags { get; set; }
 		
 		public List<string> SourceZone { get; set; }
-		public List<string> SourceAddress { get; set; }
+    public List<string> SourceAddress { get; set; }
+//    public List<AddressObject> SourceAddress { get; set; }
 		public bool SourceNegate { get; set; }
 		
 		public List<string> SourceUser { get; set; }
 		public List<string> HipProfile { get; set; }
 		
-		public List<string> DestinationZone { get; set; }
+    public List<string> DestinationZone { get; set; }
 		public List<string> DestinationAddress { get; set; }
 		public bool DestinationNegate { get; set; }
 		

@@ -38,7 +38,9 @@ $global:TestRule.Disabled           = $True
 #cp C:\dev\poweralto2\PowerAlto2.psd1 \\athena2\c$\_strap\poweralto2
 
 #get-padiskspace
-$global:test = new-object poweralto.Tag
-$global:test.name = "newtag"
-$global:test.comments = "created with poweralto2"
-$global:test.color = "gray"
+$global:test = new-object poweralto.Zone
+$global:test.name = "new_zone"
+$global:test.ZoneType = "layer3"
+$global:test.Interfaces = "eth1/1","eth1/2"
+$global:test.UserIdAclInclude = "10.10.10.0/24"
+$global:test.UserIdAclExclude = "10.90.0.0/24"

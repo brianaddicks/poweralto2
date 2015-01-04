@@ -17,7 +17,8 @@ $ManifestParams = @{ Path = $ManifestFile
                      RequiredAssemblies = @('PowerAlto2.dll','System.Web')
                      Author             = 'Brian Addicks'
                      RootModule         = 'PowerAlto2.psm1'
-                     PowerShellVersion  = '4.0' }
+                     PowerShellVersion  = '4.0'
+                     FormatsToProcess   = @('poweralto2.format.ps1xml') }
 
 New-ModuleManifest @ManifestParams
 
