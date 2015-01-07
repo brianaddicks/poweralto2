@@ -4,12 +4,7 @@ using System.Xml;
 
 namespace PowerAlto {
   public class AddressObject : PowerAltoBaseObject {
-  	//Validator Validator = new Validator();
-
-    //private string name;
     public string Name { get; set; }
-                         //set { this.name = Validator.AlphaNum( value ); } }
-
     public string Description { get; set; }
 
     List<string> validAddressTypes = new List<string>(new string[] {
@@ -93,7 +88,7 @@ namespace PowerAlto {
     
     //------------------------ CREATE XML --------------------------//
     
-    public XElement Xml () {
+    public override XElement Xml () {
                     
 			// Create root
 			XDocument XmlObject = new XDocument();
@@ -110,20 +105,5 @@ namespace PowerAlto {
 
 			return XmlObject.Element("entry");
 	  }
-
-		public string PrintPrettyXml() {
-			return Xml().ToString();
-		}
-
-		public string PrintPlainXml() {
-			string plainXml = Xml().ToString(SaveOptions.DisableFormatting);
-			string entryPattern = @"^<.+?>(.+)</entry>$";
-			Regex entryRx = new Regex(entryPattern);
-			Match entryMatch = entryRx.Match(plainXml);
-			return entryMatch.Groups[1].Value;
-
-//			return this.Xml().ToString(SaveOptions.DisableFormatting);
-
-		}
   }
 }

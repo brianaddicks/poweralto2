@@ -12,29 +12,16 @@ using System.Xml.Linq;
 using System.Text.RegularExpressions;
 
 namespace PowerAlto {
-	public class SecurityRule {
-
-		private string paNameMatch (string Name) {
-			string namePattern =  @"^[a-zA-Z0-9\-_\.]+$";
-			Regex nameRx = new Regex(namePattern);
-			Match nameMatch = nameRx.Match(Name);
-			if (nameMatch.Success) {
-				return Name;
-			} else {
-				throw new System.ArgumentException("Value can only contain alphanumeric, hyphens, underscores, or periods.");
-			}
-		}
-	
+	public class SecurityRule : PowerAltoBaseObject {
 		private string name;
 		public string Name { get { return this.name; }
-												 set { this.name = paNameMatch( value ); } }
+												 set { this.name = nameAlphaNumDashDotUnder( value, 31 ); } }
 
 		public string Description { get; set; }
 		public List<string> Tags { get; set; }
 		
-		public List<string> SourceZone { get; set; }
+    public List<string> SourceZone { get; set; }    
     public List<string> SourceAddress { get; set; }
-//    public List<AddressObject> SourceAddress { get; set; }
 		public bool SourceNegate { get; set; }
 		
 		public List<string> SourceUser { get; set; }
@@ -182,70 +169,11 @@ namespace PowerAlto {
 		
 		public bool DisableSRI { get; set; }
 		public bool Disabled { get; set; }
-
-		public SecurityRule () {
-			this.SourceAddress = new List<string> {"any"};
-			this.SourceUser = new List<string> {"any"};
-			this.HipProfile = new List<string> {"any"};
-			this.DestinationAddress = new List<string> {"any"};
-			this.Application = new List<string> {"application-default"};
-			this.UrlCategory = new List<string> {"any"};
-			this.Allow = true;
-			this.LogAtSessionEnd = true;
-		}
 		
 		public string LastUncommitedChangeBy { get; set; }
 		public string LastUncommitedChangeTimestamp { get; set; }	// This should be a datetime object
 		
-		private XElement createXmlWithMembers( string XmlKeyword, List<string> RuleProperty = null, bool Required = false) {
-			XElement nodeXml = new XElement(XmlKeyword);
-			if (RuleProperty != null) {
-				foreach (string member in RuleProperty) {
-					nodeXml.Add(
-						new XElement("member",member)
-					);
-				}
-			} else {
-				if (!(Required)) {
-					return null;
-				}
-				nodeXml.Add(
-					new XElement("member","any")
-				);
-			}
-			return nodeXml;
-		}
-
-		private XElement createXmlWithSingleMember( string XmlKeyword, string RuleProperty = null) {
-			XElement nodeXml = new XElement(XmlKeyword);
-			if (RuleProperty != null) {
-				nodeXml.Add( new XElement( "member",RuleProperty ));
-				return nodeXml;
-			} else {
-				return null;
-			}
-		}
-
-		private XElement createXmlWithoutMembers( string XmlKeyword, string RuleProperty) {
-			if (!(String.IsNullOrEmpty(RuleProperty))) {
-				XElement nodeXml = new XElement(XmlKeyword,RuleProperty);
-				return nodeXml;
-			} else {
-				return null;
-			}
-		}
-
-		private XElement createXmlBool( string XmlKeyword, bool RuleProperty ) {
-			XElement nodeXml = new XElement(XmlKeyword);
-			if (RuleProperty) {
-				nodeXml.Value = "yes";
-			} else {
-				nodeXml.Value = "no";
-			}
-			return nodeXml;
-		}
-
-		public XElement Xml () {
+		public override XElement Xml () {
                     
 			// Create root
 			XDocument XmlObject = new XDocument();
@@ -343,24 +271,9 @@ namespace PowerAlto {
 
 			XmlObject.Element("entry").Add( createXmlWithoutMembers( "description", this.Description ));	// Description
 
-			return XmlObject.Element("entry");
+      return XmlObject.Element("entry");
 	  }
 
-		public string PrintPrettyXml() {
-			return Xml().ToString();
-		}
-
-		public string PrintPlainXml() {
-			string plainXml = Xml().ToString(SaveOptions.DisableFormatting);
-			string entryPattern = @"^<.+?>(.+)</entry>$";
-			Regex entryRx = new Regex(entryPattern);
-			Match entryMatch = entryRx.Match(plainXml);
-			return entryMatch.Groups[1].Value;
-
-//			return this.Xml().ToString(SaveOptions.DisableFormatting);
-
-		}
-		
 		public string PrintCli () {
 			List<string> CliList = new List<string>();
 			
@@ -387,7 +300,7 @@ namespace PowerAlto {
 
 
 			// ----------------------------------- Zones ------------------------------------ //
-			CliList.Add(createReqCliWithMembers( "from", this.SourceZone ));				  				// Source Zones
+			CliList.Add(createReqCliWithMembers( "from", this.SourceZone ));	      			    // Source Zones
 			CliList.Add(createReqCliWithMembers( "to", this.DestinationZone ));				  			// Destination Zones
 			// ------------------------------------------------------------------------------ //
 
@@ -452,49 +365,23 @@ namespace PowerAlto {
 			string CliString = string.Join("",CliList.ToArray());  // Smash it all together
 			return CliString;
 		}
-		
-		private string createCliWithoutMembers( string CliKeyword, string RuleProperty) {
-			string CliObject = "";
-			if (RuleProperty != null) {
-				CliObject += " " + CliKeyword + " " + RuleProperty;
-			}
-			return CliObject;
+    
+    public SecurityRule () {
+			this.SourceAddress = new List<string> {"any"};
+			this.SourceUser = new List<string> {"any"};
+			this.HipProfile = new List<string> {"any"};
+			this.DestinationAddress = new List<string> {"any"};
+			this.Application = new List<string> {"application-default"};
+			this.UrlCategory = new List<string> {"any"};
+			this.Allow = true;
+			this.LogAtSessionEnd = true;
 		}
-
-		private string createReqCliWithMembers( string CliKeyword, List<string> RuleProperty = null) {
-			string CliObject = "";
-			if (RuleProperty != null) {
-				CliObject += " " + CliKeyword + " [";
-				foreach (string r in RuleProperty) {
-					CliObject += " " + r;
-				}
-				CliObject += " ]";
-			} else {
-				CliObject += " " + CliKeyword + " any";
-			}
-			return CliObject;
-		}
-
-		private string createCliWithMembers( string CliKeyword, List<string> RuleProperty = null) {
-			string CliObject = "";
-			if (RuleProperty != null) {
-				CliObject += " " + CliKeyword + " [";
-				foreach (string r in RuleProperty) {
-					CliObject += " " + r;
-				}
-				CliObject += " ]";
-			}
-			return CliObject;
-		}
-
-		private string createCliBool( string CliKeyword, bool RuleProperty ) {
-			string CliObject = "";
-			if (RuleProperty) {
-				CliObject += " " + CliKeyword + " yes";
-			} else {
-				CliObject += " " + CliKeyword + " no";
-			}
-			return CliObject;
-		}
+    
+    public string XPath {
+      get {
+        string baseXPath = "/config/devices/entry/vsys/entry/rulebase/security/rules";
+        return baseXPath;
+      }
+    }
 	}
 }

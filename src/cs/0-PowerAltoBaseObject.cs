@@ -1,9 +1,10 @@
 using System.Text.RegularExpressions;
 
 namespace PowerAlto {
-  public class PowerAltoBaseObject {
+  public abstract class PowerAltoBaseObject {
+  
     protected string nameAlphaNumDashDotUnder (string Name, int Length) {
-      string namePattern =  @"^[a-zA-Z0-9\-_\.]{1," + Length + "}$";
+      string namePattern =  @"^[a-zA-Z0-9\-_\.]{1," + Length + @"}$";
       Regex nameRx = new Regex(namePattern);
       Match nameMatch = nameRx.Match(Name);
       if (nameMatch.Success) {
@@ -11,7 +12,7 @@ namespace PowerAlto {
       } else {
         string errorMessage = null;
         if (Name.Length > Length) {
-          errorMessage = "Value must be less that 15 characters or less.";
+          errorMessage = "Value must be less that " + Length + " characters or less." + Name.Length;
         } else {
           errorMessage = "Value must contain only alphanumeric, hyphens, underscores, or periods.";
         }
@@ -47,9 +48,14 @@ namespace PowerAlto {
 			}
 		}
     
-    protected string printPlainXml( XElement xml) {
-			string plainXml = xml.ToString(SaveOptions.DisableFormatting);
-      return plainXml;
+    protected XElement createXmlWithSingleMember( string XmlKeyword, string RuleProperty = null) {
+			XElement nodeXml = new XElement(XmlKeyword);
+			if (RuleProperty != null) {
+				nodeXml.Add( new XElement( "member",RuleProperty ));
+				return nodeXml;
+			} else {
+				return null;
+			}
 		}
     
     protected XElement createXmlBool( string XmlKeyword, bool xmlValue ) {
@@ -61,6 +67,64 @@ namespace PowerAlto {
 			}
 			return nodeXml;
 		}
+
+    // -------------------- Xml Output Classes ---------------------- //
+    public abstract XElement Xml();
+    
+    public string PrintPrettyXml() {
+			return Xml().ToString();
+		}
+
+		public string PrintPlainXml() {
+      return Xml().ToString(SaveOptions.DisableFormatting);
+		}
+    // -------------------- End Xml Output Classes ---------------------- //
+    
+    // ----------------- CLI Methods ----------------- //
+    protected string createCliWithoutMembers( string CliKeyword, string RuleProperty) {
+			string CliObject = "";
+			if (RuleProperty != null) {
+				CliObject += " " + CliKeyword + " " + RuleProperty;
+			}
+			return CliObject;
+		}
+
+		protected string createReqCliWithMembers( string CliKeyword, List<string> RuleProperty = null) {
+			string CliObject = "";
+			if (RuleProperty != null) {
+				CliObject += " " + CliKeyword + " [";
+				foreach (string r in RuleProperty) {
+					CliObject += " " + r;
+				}
+				CliObject += " ]";
+			} else {
+				CliObject += " " + CliKeyword + " any";
+			}
+			return CliObject;
+		}
+
+		protected string createCliWithMembers( string CliKeyword, List<string> RuleProperty = null) {
+			string CliObject = "";
+			if (RuleProperty != null) {
+				CliObject += " " + CliKeyword + " [";
+				foreach (string r in RuleProperty) {
+					CliObject += " " + r;
+				}
+				CliObject += " ]";
+			}
+			return CliObject;
+		}
+
+		protected string createCliBool( string CliKeyword, bool RuleProperty ) {
+			string CliObject = "";
+			if (RuleProperty) {
+				CliObject += " " + CliKeyword + " yes";
+			} else {
+				CliObject += " " + CliKeyword + " no";
+			}
+			return CliObject;
+		}
+    // --------------- End CLI Methods --------------- //
 
   }
 }

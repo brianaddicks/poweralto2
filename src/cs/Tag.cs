@@ -59,7 +59,7 @@ namespace PowerAlto {
     }
     
     // ------------------------------------ XML ---------------------------------- //
-    public XElement Xml () {
+    public override XElement Xml () {
                     
 			// Create root
 			XDocument XmlObject = new XDocument();
@@ -83,14 +83,6 @@ namespace PowerAlto {
 			return XmlObject.Element("entry");
 	  }
 
-		public string PrintPrettyXml() {
-			return Xml().ToString();
-		}
-
-    public string PrintPlainXml() {
-      return printPlainXml( this.Xml() );
-    }
-    
     public string XPath {
       get {
         string baseXPath = "/config/devices/entry/vsys/entry/tag";

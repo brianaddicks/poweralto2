@@ -74,10 +74,10 @@ function Get-PaSecurityRule {
         # QoS Settings
         $QosSetting = $r.qos.marking
         if ($QosSetting.'ip-precedence') {
-            $RuleObject.QosType    = "IpPrecedence"
+            $RuleObject.QosType    = "ip-precedence"
             $RuleObject.QosMarking = $QosSetting.'ip-precedence'
         } elseif ($QosSetting.'ip-dscp') {
-            $RuleObject.QosType    = "IpDscp"
+            $RuleObject.QosType    = "ip-dscp"
             $RuleObject.QosMarking = $QosSetting.'ip-dscp'
         }
 

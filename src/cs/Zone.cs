@@ -45,7 +45,7 @@ namespace PowerAlto {
       }
     }
     
-    public XElement Xml () {
+    public override XElement Xml () {
                     
 			// Create root
 			XDocument XmlObject = new XDocument();
@@ -69,14 +69,5 @@ namespace PowerAlto {
 
 			return XmlObject.Element("entry");
 	  }
-    
-    
-		public string PrintPrettyXml() {
-			return Xml().ToString();
-		}
-
-		public string PrintPlainXml() {
-			return this.Xml().ToString(SaveOptions.DisableFormatting);
-		}
   }
 }
