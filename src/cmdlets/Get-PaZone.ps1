@@ -31,7 +31,7 @@ function Get-PaZone {
         $ZoneObject.UserIdAclExclude      = $z.'user-acl'.'exclude-list'.member
 
         if ($z.'enable-user-identification') {
-            $ZoneObject.EnableUserIdentification = $true
+            $ZoneObject.EnableUserId = $true
         }
 
 

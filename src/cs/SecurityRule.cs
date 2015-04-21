@@ -17,6 +17,7 @@ namespace PowerAlto {
 		public string Name { get { return this.name; }
 												 set { this.name = nameAlphaNumDashDotUnder( value, 31 ); } }
 
+    public string RuleType { get; set; }  //needs validation: universal, intrazone, interzone
 		public string Description { get; set; }
 		public List<string> Tags { get; set; }
 		
@@ -375,6 +376,7 @@ namespace PowerAlto {
 			this.UrlCategory = new List<string> {"any"};
 			this.Allow = true;
 			this.LogAtSessionEnd = true;
+      this.RuleType = "universal";
 		}
     
     public string XPath {

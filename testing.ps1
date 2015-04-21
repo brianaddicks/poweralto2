@@ -1,10 +1,11 @@
 ﻿$VerbosePreference = "Continue"
 & ".\buildmodule.ps1"
 $Device = "10.10.72.2"
+#$Device = "10.0.2.61"
 $ApiKey = "LUFRPT1SanJaQVpiNEg4TnBkNGVpTmRpZTRIamR4OUE9Q2lMTUJGREJXOCs3SjBTbzEyVSt6UT09"
 #$ApiKey = "LUFRPT1XODhhTmV5M3dXMHBYQ2o1bnNUMnc1SEtSb1U9c3JuMTV2Um8yNlRPaTI3UlV1Y2xZSkRQODBLVEIwUVNIbDhtTENNYWhZdz0="
 ipmo C:\dev\poweralto2\poweralto2.psd1
-Get-PaDevice $Device $ApiKey
+Get-PaDevice $Device -apikey $ApiKey
 <#
 $global:TestRule                    = new-object PowerAlto.SecurityRule
 $global:TestRule.Name               = "newrule"
@@ -37,6 +38,7 @@ $global:TestRule.Disabled           = $True
 #cp C:\dev\poweralto2\PowerAlto2.dll \\athena2\c$\_strap\poweralto2
 #cp C:\dev\poweralto2\PowerAlto2.psd1 \\athena2\c$\_strap\poweralto2
 
+<#
 #get-padiskspace
 $global:test = new-object poweralto.Zone
 $global:test.name = "new_zone"
@@ -44,3 +46,33 @@ $global:test.ZoneType = "layer3"
 $global:test.Interfaces = "eth1/1","eth1/2"
 $global:test.UserIdAclInclude = "10.10.10.0/24"
 $global:test.UserIdAclExclude = "10.90.0.0/24"
+#>
+
+$global:test = New-PaSecurityRule -Name poweralto-test2 -RuleType Universal -Description "test description" -tags "tag1","tag2" -Disabled
+$global:test | Set-PaRuleSource -Zone lan -Address '10.10.10.10/32' -Negate
+$global:test | Set-PaRuleDestination -Zone net
+$global:test | Set-PaRuleApplication -Application 'active-directory','dns','ldap','ping'
+$global:test | Set-PaRuleServiceUrl -Service 'application-default'
+$global:test | Set-PaSecurityRuleActions -Action allow
+$global:test | Set-PaSecurityRuleActions -LogEnd -LogForwarding 'log-all'
+$global:test | Set-PaSecurityRuleActions -ProfileGroup 'threat-and-vuln'
+$global:test | Set-PaSecurityRuleActions -Schedule test
+$global:test | Set-PaSecurityRuleActions -DscpMarking af11
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

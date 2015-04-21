@@ -126,7 +126,14 @@ namespace PowerAlto {
         public void OverrideValidation() {
             ServicePointManager.ServerCertificateValidationCallback = OnValidateCertificate;
             ServicePointManager.Expect100Continue = true;
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3;
+            //ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3;
+			// the following has different behaviors depending on the host powershell version
+			// powershell v2: SecurityProtocol = Tls (this means Tls 1.0)
+			// powershell v3 might be the same as v2. Currently untested.
+			// powershell v4: SecurityProtocol = Tls, Tls11, Tls12
+			ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
+			
+			//[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls -bor [System.Net.SecurityProtocolType]::Tls11 -bor [System.Net.SecurityProtocolType]::Tls12
         }
 
         //Holds the raw result of the last query
@@ -166,6 +173,7 @@ namespace PowerAlto {
 
             HttpWebResponse Response = null;
             HttpStatusCode StatusCode = new HttpStatusCode();
+			HttpQueryReturnObject ReturnObject = new HttpQueryReturnObject();
 
             try {
                 HttpWebRequest Request = WebRequest.Create( Url ) as HttpWebRequest;
@@ -179,11 +187,11 @@ namespace PowerAlto {
                     StatusCode = ( (HttpWebResponse)we.Response ).StatusCode;
                 }
 
-                string DetailedError = Response.GetResponseHeader( "X-Detailed-Error" );
+                ReturnObject.DetailedError = Response.GetResponseHeader( "X-Detailed-Error" );
                 // }
 
             } catch {
-                throw new HttpException( "httperror" );
+                throw new HttpException( ReturnObject.DetailedError );
             }
 
             if ( Response.StatusCode.ToString() == "OK" ) {
@@ -198,7 +206,7 @@ namespace PowerAlto {
                 Reader.Close();
                 Response.Close();
 
-                HttpQueryReturnObject ReturnObject = new HttpQueryReturnObject();
+                
                 ReturnObject.Statuscode = StatusCode;
                 if ( AsXml ) { ReturnObject.Data = XResult; }
                 ReturnObject.RawData = Result;

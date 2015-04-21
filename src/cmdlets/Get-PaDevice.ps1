@@ -77,20 +77,20 @@ function Get-PaDevice {
 			$Protocol = "https"
 			if (!$Port) { $Port = 443 }
 			
-			$PaDeviceObject = New-Object Poweralto.PaDevice
+			$global:PaDeviceObject = New-Object Poweralto.PaDevice
 			
-			$PaDeviceObject.Protocol = $Protocol
-			$PaDeviceObject.Port     = $Port
-			$PaDeviceObject.Device   = $Device
+			$global:PaDeviceObject.Protocol = $Protocol
+			$global:PaDeviceObject.Port     = $Port
+			$global:PaDeviceObject.Device   = $Device
 
             if ($ApiKey) {
-                $PaDeviceObject.ApiKey = $ApiKey
+                $global:PaDeviceObject.ApiKey = $ApiKey
             } else {
                 $UserName = $PaCred.UserName
                 $Password = $PaCred.getnetworkcredential().password
             }
 			
-			$PaDeviceObject.OverrideValidation()
+			$global:PaDeviceObject.OverrideValidation()
 		}
     }
 
@@ -102,42 +102,45 @@ function Get-PaDevice {
                                    password = $Password }
 
             $QueryString = HelperCreateQueryString $QueryStringTable
-		    $url         = $PaDeviceObject.UrlBuilder($QueryString)
+			Write-Debug $QueryString
+		    $url         = $global:PaDeviceObject.UrlBuilder($QueryString)
 
-		    try   { $QueryObject = $PaDeviceObject.HttpQuery($url) } `
+		    try   { $QueryObject = $global:PaDeviceObject.HttpQuery($url) } `
             catch {	throw "Error performing HTTP query"	           }
 
             $Data                  = HelperCheckPaError $QueryObject
-            $PaDeviceObject.ApiKey = $Data.key
+            $global:PaDeviceObject.ApiKey = $Data.key
         }
         
         $QueryStringTable = @{ type = "op"
                                cmd  = "<show><system><info></info></system></show>" }
 
         $QueryString = HelperCreateQueryString $QueryStringTable
-		$url         = $PaDeviceObject.UrlBuilder($QueryString)
+        Write-Debug "QueryString: $QueryString"
+		$url         = $global:PaDeviceObject.UrlBuilder($QueryString)
+        Write-Debug "URL: $Url"
 
-		try   { $QueryObject = $PaDeviceObject.HttpQuery($url) } `
-        catch {	throw "Error performing HTTP query"	           }
+		try   { $QueryObject = $global:PaDeviceObject.HttpQuery($url) } `
+        catch {	throw $_.Exception.Message       	           }
 
         $Data = HelperCheckPaError $QueryObject
 		$Data = $Data.system
 
-        $PaDeviceObject.Name            = $Data.hostname
-        $PaDeviceObject.Model           = $Data.model
-        $PaDeviceObject.Serial          = $Data.serial
-        $PaDeviceObject.OsVersion       = $Data.'sw-version'
-        $PaDeviceObject.GpAgent         = $Data.'global-protect-client-package-version'
-        $PaDeviceObject.AppVersion      = $Data.'app-version'
-        $PaDeviceObject.ThreatVersion   = $Data.'threat-version'
-        $PaDeviceObject.WildFireVersion = $Data.'wildfire-version'
-        $PaDeviceObject.UrlVersion      = $Data.'url-filtering-version'
+        $global:PaDeviceObject.Name            = $Data.hostname
+        $global:PaDeviceObject.Model           = $Data.model
+        $global:PaDeviceObject.Serial          = $Data.serial
+        $global:PaDeviceObject.OsVersion       = $Data.'sw-version'
+        $global:PaDeviceObject.GpAgent         = $Data.'global-protect-client-package-version'
+        $global:PaDeviceObject.AppVersion      = $Data.'app-version'
+        $global:PaDeviceObject.ThreatVersion   = $Data.'threat-version'
+        $global:PaDeviceObject.WildFireVersion = $Data.'wildfire-version'
+        $global:PaDeviceObject.UrlVersion      = $Data.'url-filtering-version'
 
-        $global:PaDeviceObject = $PaDeviceObject
+        #$global:PaDeviceObject = $PaDeviceObject
 
 		
 		if (!$Quiet) {
-			return $PaDeviceObject | Select-Object @{n='Connection';e={$_.ApiUrl}},Name,OsVersion
+			return $global:PaDeviceObject | Select-Object @{n='Connection';e={$_.ApiUrl}},Name,OsVersion
 		}
     }
 }
