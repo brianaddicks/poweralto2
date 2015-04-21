@@ -36,7 +36,7 @@ function Get-PaAddressGroupObject {
         
         if ($r.dynamic) {
             $ResponseObject.Type = 'dynamic'
-            $ResponseObject.Filter = $r.dynamic.filter
+            $ResponseObject.Filter = $r.dynamic.filter.trim()
         }
 
         if ($r.static) {
@@ -59,7 +59,11 @@ function Get-PaAddressGroupObject {
     if ($DynamicGroups) {
         $Addresses = Get-PaAddressObject
         foreach ($d in $DynamicGroups) {
+            $Expression = HelperConvertFilterToPosh $d.Filter Addresses Tags
             Write-Verbose $d.Filter
+            Write-Verbose $Expression
+            $Members = @(iex $Expression)
+            $d.Members = $Members.Name
         }
     }
     

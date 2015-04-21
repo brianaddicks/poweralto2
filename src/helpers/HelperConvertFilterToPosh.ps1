@@ -24,5 +24,3 @@
 
     return $MatchString
 }
-
-HelperConvertFilterToPosh "'internal' and 'github' or 'tag1'" Address Tags | clip
