@@ -8,8 +8,13 @@
         [switch]$ShowProgress,
 
         [Parameter(Mandatory=$False)]
-        [switch]$WaitForCompletion
+        [switch]$WaitForCompletion,
+
+        [Parameter(Mandatory=$False)]
+        [int]$CheckInterval = 15
     )
+
+    $CmdletName = $MyInvocation.MyCommand.Name
 
     if ($Id) {
         $Command = "<show><jobs><id>$Id</id></jobs></show>"
@@ -31,7 +36,12 @@
         $NewJob.Status = $Entry.status
         $NewJob.Result = $Entry.result
         $NewJob.TimeCompleted = $Entry.tfin
-        $NewJob.Details = $Entry.details.line
+        if ($Entry.details.line.newjob) {
+            $NewJob.Details = $Entry.details.line.newjob.newmsg
+            $NewJob.NextJob = [int]($Entry.details.line.newjob.nextjob)
+        } else {
+            $NewJob.Details = $Entry.details.line
+        }
         $NewJob.Warnings = $Entry.warnings.line
 
         if ($Entry.stoppable -eq 'yes') {
@@ -55,7 +65,7 @@
         $ActiveJob = ProcessEntry $ResponseData.job
         if ($ShowProgress) {
             $ProgressParams = @{'Activity'         = $ActiveJob.Type
-                                'CurrentOperation' = 'Checking status in 15 seconds...'
+                                'CurrentOperation' = "Checking status in $CheckInterval seconds..."
                                 'Status'           = "$($ActiveJob.Progress)% complete"
                                 'Id'               = $ActiveJob.Id
                                 'PercentComplete'  = $ActiveJob.Progress}
@@ -63,26 +73,28 @@
         }
 
         while ($ActiveJob.Progress -ne 100) {
-            #Start-Sleep -s 15
-            
 
             $i = 0
-            while ($i -lt 15) {
+            while ($i -lt $CheckInterval) {
                 Start-Sleep -s 1
                 $i ++
                 if ($ShowProgress) {
-                    $ProgressParams.Set_Item("CurrentOperation","Checking Status in $(15 - $i) seconds...")
+                    $ProgressParams.Set_Item("CurrentOperation","Checking Status in $($CheckInterval - $i) seconds...")
                     Write-Progress @ProgressParams
                 }
             }
             
+            $CurrentOperation = "Checking status now"
+            HelperWriteCustomVerbose $CmdletName $CurrentOperation
             if ($ShowProgress) {
-                $ProgressParams.Set_Item("CurrentOperation","Checking Status now")
+                $ProgressParams.Set_Item("CurrentOperation",$CurrentOperation)
                 Write-Progress @ProgressParams
             }
              
             $UpdateJob = Invoke-PaOperation $Command
             $ActiveJob = ProcessEntry $UpdateJob.Job
+            $Status    = "$($ActiveJob.Progress)% complete"
+            HelperWriteCustomVerbose $CmdletName $Status
 
             if ($ShowProgress) {
                 $ProgressParams.Set_Item("PercentComplete",$ActiveJob.Progress)

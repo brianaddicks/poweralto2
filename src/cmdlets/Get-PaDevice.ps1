@@ -1,4 +1,5 @@
 function Get-PaDevice {
+    [CmdletBinding()]
 	<#
 	.SYNOPSIS
 		Establishes initial connection to Palo Alto API.
@@ -106,7 +107,7 @@ function Get-PaDevice {
 		    $url         = $global:PaDeviceObject.UrlBuilder($QueryString)
 
 		    try   { $QueryObject = $global:PaDeviceObject.HttpQuery($url) } `
-            catch {	throw "Error performing HTTP query"	           }
+            catch {	throw $_.Exception.Message	           }
 
             $Data                  = HelperCheckPaError $QueryObject
             $global:PaDeviceObject.ApiKey = $Data.key

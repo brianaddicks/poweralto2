@@ -14,15 +14,23 @@ using System.Text.RegularExpressions;
 namespace PowerAlto {
 	public class SecurityRule : PowerAltoBaseObject {
 		private string name;
-		public string Name { get { return this.name; }
-												 set { this.name = nameAlphaNumDashDotUnder( value, 31 ); } }
+		public string Name {
+			get { return this.name; }
+			set { this.name = nameAlphaNumDashDotUnder( value, 31 ); }
+		}
 
-    public string RuleType { get; set; }  //needs validation: universal, intrazone, interzone
+		public string RuleType { get; set; }  //needs validation: universal, intrazone, interzone
 		public string Description { get; set; }
 		public List<string> Tags { get; set; }
 		
-    public List<string> SourceZone { get; set; }    
-    public List<string> SourceAddress { get; set; }
+		public List<string> SourceZone { get; set; }   
+		
+		private List<string> sourceAddress;
+		public List<string> SourceAddress {
+			get { return this.sourceAddress; }
+			set { this.sourceAddress = value; }
+		}
+		
 		public bool SourceNegate { get; set; }
 		
 		public List<string> SourceUser { get; set; }
@@ -376,7 +384,7 @@ namespace PowerAlto {
 			this.UrlCategory = new List<string> {"any"};
 			this.Allow = true;
 			this.LogAtSessionEnd = true;
-      this.RuleType = "universal";
+      		this.RuleType = "universal";
 		}
     
     public string XPath {

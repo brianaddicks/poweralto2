@@ -22,6 +22,7 @@ namespace PowerAlto {
     public string Result { get; set; }
     public string TimeCompleted { get; set; }
     public string Details { get; set; }
+	public int NextJob { get; set; }
     public string Warnings { get; set; }
     public int Progress { get; set; }
 	}

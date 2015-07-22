@@ -1,4 +1,5 @@
 function Get-PaSecurityRule {
+    [CmdletBinding()]
     Param (
 		[Parameter(Mandatory=$False,Position=0)]
 		[string]$Name,
@@ -51,7 +52,8 @@ function Get-PaSecurityRule {
         $RuleObject.Service     = HelperGetPropertyMembers $r service
 
         # Action Setting
-        if ($r.action -eq 'allow') { $RuleObject.Allow = $true }
+        if ($r.action -eq 'allow') { $RuleObject.Allow = $true } `
+                              else { $RuleObject.Allow = $false }
 
         # Profile Setting
         $ProfileSetting = $r.'profile-setting'

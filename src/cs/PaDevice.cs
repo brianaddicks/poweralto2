@@ -177,6 +177,7 @@ namespace PowerAlto {
 
             try {
                 HttpWebRequest Request = WebRequest.Create( Url ) as HttpWebRequest;
+				Request.Timeout = 20000;
 
                 //if (Response.ContentLength > 0) {
 

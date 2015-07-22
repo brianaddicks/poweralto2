@@ -15,7 +15,7 @@ namespace PowerAlto {
 	public class Service {
 
 		private string paNameMatch (string Name) {
-			string namePattern =  @"^[a-zA-Z0-9\-_\.]+$";
+			string namePattern =  @"^[a-zA-Z0-9\-_\.\ ]+$";
 			Regex nameRx = new Regex(namePattern);
 			Match nameMatch = nameRx.Match(Name);
 			if (nameMatch.Success) {

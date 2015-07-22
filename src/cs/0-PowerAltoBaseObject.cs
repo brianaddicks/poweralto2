@@ -4,7 +4,7 @@ namespace PowerAlto {
   public abstract class PowerAltoBaseObject {
   
     protected string nameAlphaNumDashDotUnder (string Name, int Length) {
-      string namePattern =  @"^[a-zA-Z0-9\-_\.]{1," + Length + @"}$";
+      string namePattern =  @"^[a-zA-Z0-9\-_\.\ ]{1," + Length + @"}$";
       Regex nameRx = new Regex(namePattern);
       Match nameMatch = nameRx.Match(Name);
       if (nameMatch.Success) {
@@ -14,7 +14,7 @@ namespace PowerAlto {
         if (Name.Length > Length) {
           errorMessage = "Value must be less that " + Length + " characters or less." + Name.Length;
         } else {
-          errorMessage = "Value must contain only alphanumeric, hyphens, underscores, or periods.";
+          errorMessage = "Value must contain only alphanumeric, hyphens, underscores, spaces, or periods.";
         }
         throw new System.ArgumentException(errorMessage);
       }

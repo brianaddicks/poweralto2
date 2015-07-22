@@ -1,4 +1,51 @@
-﻿$ScriptPath = Split-Path $($MyInvocation.MyCommand).Path
+﻿[CmdletBinding()]
+Param (
+    [Parameter(Mandatory=$False,Position=0)]
+	[switch]$PushToStrap
+)
+
+function ZipFiles {
+    [CmdletBinding()]
+    Param (
+    	[Parameter(Mandatory=$True,Position=0)]
+		[string]$ZipFilePath,
+
+        [Parameter(ParameterSetName="Directory",Mandatory=$True,Position=1)]
+        [string]$SourceDir,
+
+        [Parameter(ParameterSetName="Files",Mandatory=$True,Position=1)]
+        [Array]$SourceFiles,
+
+        [Parameter(Mandatory=$False)]
+        [switch]$Force
+
+    )
+    Add-Type -Assembly System.IO.Compression.FileSystem
+    $CompressionLevel = [System.IO.Compression.CompressionLevel]::Optimal
+
+    if (Test-Path $ZipFilePath) {
+        if ($Force) {
+            $Delete = Remove-Item $ZipFilePath
+        } else {
+            Throw "$ZipFilePath exists, use -Force to replace"
+        }
+    }
+
+    if ($SourceFiles) {
+        $TempZipFolder = 'newzip'
+        $TempZipFullPath = "$($env:temp)\$TempZipFolder"
+        $CreateFolder = New-Item -Path $env:temp -Name $TempZipFolder -ItemType Directory
+        $Copy = Copy-Item $SourceFiles -Destination $TempZipFullPath
+        $SourceDir = $TempZipFullPath
+    }
+
+    [System.IO.Compression.ZipFile]::CreateFromDirectory($SourceDir,$ZipFilePath, $CompressionLevel, $false)
+
+    $Cleanup = Remove-Item $TempZipFullPath -Recurse
+}
+
+
+$ScriptPath = Split-Path $($MyInvocation.MyCommand).Path
 
 $SourceDirectory = "src"
 $SourcePath      = $ScriptPath + "\" + $SourceDirectory
@@ -152,6 +199,13 @@ $Output += $Footer
 # Output File
 
 $Output | Out-File $OutputFile -Force
+
+if ($PushToStrap) {
+    $FilesToZip = ls "$PSScriptRoot\poweralto*" -Exclude *.zip
+    $CreateZip = ZipFiles -ZipFilePath "$PSScriptRoot\poweralto2.zip" -SourceFiles $FilesToZip -Force
+    $StageFolder = '\\vmware-host\Shared Folders\Dropbox\strap\stages\poweralto2\'
+    $Copy = Copy-Item "$PSScriptRoot\poweralto2.zip" $StageFolder -Force
+}
 
 #cp C:\dev\poweralto2\PowerAlto2.psm1 \\athena2\c$\_strap\poweralto2
 #cp C:\dev\poweralto2\PowerAlto2.cs \\athena2\c$\_strap\poweralto2

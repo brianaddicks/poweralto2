@@ -5,15 +5,20 @@ function HelperCheckPaError {
 	    $Response
     )
 
+    $CmdletName = $MyInvocation.MyCommand.Name
+
     $Status = $Response.data.response.status
-    Write-Verbose $Status
+    HelperWriteCustomVerbose $CmdletName "Status returned: $Status"
 
     if ($Response.data.response.result.error) {
         $ErrorMessage = $Response.data.response.result.error
     }
 
     if ($Status -eq "error") {
-        if ($Response.data.response.code) {
+        if ($Response.data.response.msg.line -eq "Command succeeded with no output") {
+            HelperWriteCustomVerbose $CmdletName $Response.data.response.msg.line
+            #placeholder for stupid restart api call
+        } elseif ($Response.data.response.code) {
             $ErrorMessage  = "Error Code $($Response.data.response.code): "
             $ErrorMessage += $Response.data.response.result.msg
         } elseif ($Response.data.response.msg.line) {
