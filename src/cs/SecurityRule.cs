@@ -13,6 +13,7 @@ using System.Text.RegularExpressions;
 
 namespace PowerAlto {
 	public class SecurityRule : PowerAltoBaseObject {
+		public int Number;
 		private string name;
 		public string Name {
 			get { return this.name; }

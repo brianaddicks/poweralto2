@@ -10,7 +10,7 @@ function Get-PaSecurityRule {
 
     $Xpath = "/config/devices/entry/vsys/entry/rulebase/security/rules"
 
-    if ($Name) { $Xpath += "/entry[@name='$Name']" }
+    #if ($Name) { $Xpath += "/entry[@name='$Name']" }
 
     if ($Candidate) { $Action = "get"; Throw "not supported yet"  } `
                else { $Action = "show" }
@@ -20,11 +20,15 @@ function Get-PaSecurityRule {
     if ($RuleData.rules) { $RuleData = $RuleData.rules.entry } `
                     else { $RuleData = $RuleData.entry       }
         
-
+    $RuleCount = 0
     $RuleTable = @()
     foreach ($r in $RuleData) {
         $RuleObject = New-Object PowerAlto.SecurityRule
 
+        # Number
+        $RuleCount++
+        $RuleObject.Number = $RuleCount
+        
         # General
         $RuleObject.Name        = $r.Name
         $RuleObject.Description = $r.Description
@@ -89,6 +93,10 @@ function Get-PaSecurityRule {
         if ($r.disabled -eq 'yes') { $RuleObject.Disabled = $true }
 
         $RuleTable += $RuleObject
+    }
+    
+    if ($Name) {
+        $RuleTable = $RuleTable | ? { $_.Name -eq $Name }
     }
 
     return $RuleTable
