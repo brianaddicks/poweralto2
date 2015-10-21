@@ -32,6 +32,8 @@ $ServicGroups  = Get-PaServiceGroup
 $AppGroups     = Get-PaApplicationGroupObject
 $NatPolicies   = Get-PaNatPolicy
 
+$Test = read-host "continue?"
+
 $ExpandedObjects = @()
 
 function Resolve-PaAddressGroup {
@@ -244,10 +246,14 @@ function Resolve-PaRuleField {
                         $ValueRule.$Field  = $f
                         $ReturnObject     += $ValueRule
                     }
-                    { ( $_ -match $IpMaskRx ) -or 
-                      ( $_ -match $IpRx) } {
+                    { $_ -match $IpMaskRx } {
                         $ValueRule         = $NewRule.psobject.copy()
                         $ValueRule.$Field  = $f
+                        $ReturnObject     += $ValueRule
+                    }
+                    { $_ -match $IpRx } {
+                        $ValueRule         = $NewRule.psobject.copy()
+                        $ValueRule.$Field  = $f + '/32'
                         $ReturnObject     += $ValueRule
                     }
                     $null { $ReturnObject += $NewRule }
@@ -455,7 +461,7 @@ function Check-PaRuleRoute {
 
 #$ValidatedRules = Check-PaRuleRoute $ResolvedRules $ZoneMaps
 
-$StaticNats = $ResolvedNatPolicies | ? { ($_.SourceTranslationType -eq 'StaticIp') -and ($_.IsBidirectional) -and (!($_.Disabled)) }
+$StaticNats = $ResolvedNatPolicies | ? { ($_.SourceTranslationType -eq 'StaticIp') -and ($_.IsBidirectional) }
 
 foreach ($Policy in $StaticNats) {
     Write-Host $Policy.Number
@@ -466,7 +472,10 @@ foreach ($Policy in $StaticNats) {
     foreach ($l in $Lookup) {
         $l.NatDest = $Policy.SourceAddress
         $l.NatName = $Policy.name
+        if ($Policy.Disabled) {
+            $l.Notes = "Nat Disabled"
+        }
     }
 }
 
-
+$ResolvedRules | select Number,Name,Disabled,Allow,Source*,Dest*,UrlCategory,NatDest,Service,Application,*Profile*,NatName,Notes | Export-Csv C:\temp\rules.csv -NoTypeInformation
