@@ -11,7 +11,7 @@ function Get-PaNatPolicy {
     $Xpath        = $InfoObject.BaseXPath
     $RootNodeName = 'rules'
 
-    if ($Name) { $Xpath += "/entry[@name='$Name']" }
+    #if ($Name) { $Xpath += "/entry[@name='$Name']" }
     Write-Debug "xpath: $Xpath"
 
     if ($Candidate) { $Action = "get"; Throw "not supported yet"  } `
@@ -25,11 +25,16 @@ function Get-PaNatPolicy {
     if ($ResponseData.$RootNodeName) { $ResponseData = $ResponseData.$RootNodeName.entry } `
                                 else { $ResponseData = $ResponseData.entry         }
 
+    $RuleCount = 0
     $ResponseTable = @()
 
     foreach ($r in $ResponseData) {
         $ResponseObject = New-Object PowerAlto.NatPolicy
         Write-Verbose "Creating new NatPolicy"
+            
+        # Number
+        $RuleCount++
+        $ResponseObject.Number = $RuleCount
         
         $ResponseObject.Name        = $r.name
         $ResponseObject.Tags        = HelperGetPropertyMembers $r tag
@@ -42,6 +47,8 @@ function Get-PaNatPolicy {
         $ResponseObject.DestinationInterface = $r.'to-interface'
         $ResponseObject.SourceAddress        = HelperGetPropertyMembers $r source
         $ResponseObject.DestinationAddress   = HelperGetPropertyMembers $r destination
+        
+        if ($r.disabled -eq 'yes') { $ResponseObject.Disabled = $true }
 
         $SourceTranslation = $r.'source-translation'
         if ($SourceTranslation.'static-ip') {
@@ -68,12 +75,12 @@ function Get-PaNatPolicy {
 
         $ResponseTable += $ResponseObject
 
-        <#
-        DestinationAddressTranslation :
-        DestinationTranslatedPort     :
-        #>
-
     }
+    
+    if ($Name) {
+        $ResponseTable = $ResponseTable | ? { $_.Name -eq $Name }
+    }
+    
     return $ResponseTable
 
 }

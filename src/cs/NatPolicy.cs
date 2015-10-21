@@ -13,6 +13,7 @@ using System.Text.RegularExpressions;
 
 namespace PowerAlto {
 	public class NatPolicy : PowerAltoBaseObject {
+		public int Number;
 		public string Name { get; set; }
 		public string Description { get; set; }
 		public string NatType { get; set; }
@@ -36,6 +37,8 @@ namespace PowerAlto {
 		public string DestinationAddressTranslation { get; set; }
 		public string DestinationTranslatedPort { get; set; }
 		
+		public bool Disabled { get; set; }
+		
 		public string BaseXPath {
 			get {
 				return "/config/devices/entry/vsys/entry/rulebase/nat/rules";
@@ -55,6 +58,7 @@ namespace PowerAlto {
 			this.SourceAddress = new List<string> {"any"};
 			this.DestinationAddress = new List<string> {"any"};
 			this.SourceTranslationType = "none";
+			this.Disabled = false;
 		}
 		
 		
