@@ -27,7 +27,19 @@ function Get-PaKerberosServerProfile {
     foreach ($r in $ResponseData) {
         $ResponseObject = New-Object PowerAlto.KerberosServerProfile
         
-        $ResponseObject.Name           = $r.name
+        $ResponseObject.Name   = $r.name
+        $ResponseObject.Realm  = $r.realm
+        $ResponseObject.Domain = $r.domain
+        
+        foreach ($Server in $r.server.entry) {
+            $KerberosServer          = New-Object PowerAlto.KerberosServer
+            $KerberosServer.Name     = $Server.name
+            $KerberosServer.Host     = $Server.host
+            if ($Server.port) {
+                $KerberosServer.Port     = $Server.port
+            }
+            $ResponseObject.Servers += $KerberosServer
+        }
         
         $ResponseTable += $ResponseObject
     }
