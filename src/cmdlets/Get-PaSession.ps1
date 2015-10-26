@@ -87,7 +87,7 @@ function Get-PaSession {
         [string]$VsysName
     )
 
-    $ReturnObject = $False
+    $ReturnObject = @()
     
     
     
@@ -110,7 +110,6 @@ function Get-PaSession {
                      "qos-class"         = $QosClass
                      "qos-node-id"       = $QosNodeId
                      "qos-rule"          = $QosRule
-                     "rematch"           = "security-policy"
                      "rule"              = $SecurityRule
                      "source"            = $Source
                      "source-port"       = $SourcePort
@@ -131,46 +130,131 @@ function Get-PaSession {
             $FilterString += "</" + [string]$Filter.Name + ">"
         }
     }
-    
-    
-    <#
-    if ($Application)       { $FilterString += "<application>"       + "$Application"       + "</application>"       }
-    if ($Destination)       { $FilterString += "<destination>"       + "$Destination"       + "</destination>"       }
-    if ($DestinationPort)   { $FilterString += "<destination-port>"  + "$DestinationPort"   + "</destination-port>"  }
-    if ($DestinationUser)   { $FilterString += "<destination-user>"  + "$DestinationUser"   + "</destination-user>"  }
-    if ($EgressInterface)   { $FilterString += "<egress-interface>"  + "$EgressInterface"   + "</egress-interface>"  }
-    if ($SourceZone)        { $FilterString += "<from>"              + "$SourceZone"        + "</from>"              }
-    if ($HardwareInterface) { $FilterString += "<hw-interface>"      + "$HardwareInterface" + "</hw-interface>"      }
-    if ($IngressInterface)  { $FilterString += "<ingress-interface>" + "$IngressInterface"  + "</ingress-interface>" }
-    if ($MinKb)             { $FilterString += "<min-kb>"            + "$MinKb"             + "</min-kb>"            }
-    if ($Nat)               { $FilterString += "<nat>"               + "$Nat"               + "</nat>"               }
-    if ($NatRule)           { $FilterString += "<nat-rule>"          + "$NatRule"           + "</nat-rule>"          }
-    if ($PbfRule)           { $FilterString += "<pbf-rule>"          + "$PbfRule"           + "</pbf-rule>"          }
-    if ($Protocol)          { $FilterString += "<protocol>"          + "$Protocol"          + "</protocol>"          }
-    if ($QosClass)          { $FilterString += "<qos-class>"         + "$QosClass"          + "</qos-class>"         }
-    if ($QosNodeId)         { $FilterString += "<qos-node-id>"       + "$QosNodeId"         + "</qos-node-id>"       }
-    if ($QosRule)           { $FilterString += "<qos-rule>"          + "$QosRule"           + "</qos-rule>"          }
-    if ($Rematch)           { $FilterString += "<rematch>"           + "security-policy"    + "</rematch>"           }
-    if ($SecurityRule)      { $FilterString += "<rule>"              + "$SecurityRule"      + "</rule>"              }
-    if ($Source)            { $FilterString += "<source>"            + "$Source"            + "</source>"            }
-    if ($SourcePort)        { $FilterString += "<source-port>"       + "$SourcePort"        + "</source-port>"       }
-    if ($SourceUser)        { $FilterString += "<source-user>"       + "$SourceUser"        + "</source-user>"       }
-    if ($SslDecrypt)        { $FilterString += "<ssl-decrypt>"       + "$SslDecrypt"        + "</ssl-decrypt>"       }
-    if ($StartAt)           { $FilterString += "<start-at>"          + "$StartAt"           + "</start-at>"          }
-    if ($State)             { $FilterString += "<state>"             + "$State"             + "</state>"             }
-    if ($DestinationZone)   { $FilterString += "<to>"                + "$DestinationZone"   + "</to>"                }
-    if ($Type)              { $FilterString += "<type>"              + "$Type"              + "</type>"              }
-    if ($VsysName)          { $FilterString += "<vsys-name>"         + "$VsysName"          + "</vsys-name>"         }
-#>
+
     if ($Id) {
-        $Command = "<show><session><id>$Filter</id></session></show>"
+        $Command = "<show><session><id>$Id</id></session></show>"
     } elseif ($FilterString -ne "") {
         $Command = "<show><session><all><filter>$FilterString</filter></all></session></show>"
     } else {
-        Throw "Must specifiy an Id or a Filter"
+        $Command = "<show><session><all></all></session></show>"
+        #Throw "Must specifiy an Id or a Filter"
     }
 	
     $ResponseData = Invoke-PaOperation $Command
+    
+    if ($ResponseData.entry) { $ResponseData = $ResponseData.entry } `
+                        else { $ResponseData = @($ResponseData)    }
+    
+    $Global:test = $ResponseData
+    
+    foreach ($Entry in $ResponseData) {
+        Write-verbose "1"
+        $global:testentry = $Entry
+        $NewObject     = New-Object -TypeName PowerAlto.Session
+        $ReturnObject += $NewObject
+        
+        if ($Id) { $NewObject.Id = $Id } `
+            else { $NewObject.Id = $Entry.idx }
+
+        # Interfaces
+        if ($NewObject.IngressInterface = $Entry.ingress) {
+            $NewObject.IngressInterface = $Entry.ingress
+        } else {
+            $NewObject.IngressInterface = $Entry.'igr-if'
+        }
+        
+        if ($NewObject.EgressInterface = $Entry.egress) {
+            $NewObject.EgressInterface = $Entry.egress
+        } else {
+            $NewObject.EgressInterface = $Entry.'egr-if'
+        }
+        
+        # Times
+        $NewObject.StartTime  = $Entry.'start-time'
+        $NewObject.Timeout    = $Entry.timeout
+        $NewObject.TimeToLive = $Entry.ttl
+            
+            
+        $NewObject.Application      = $Entry.application
+        $NewObject.Vsys             = $Entry.vsys
+
+        if ($NewObject.SecurityRule = $Entry.'security-rule') {
+            $NewObject.SecurityRule = $Entry.'security-rule'
+        } else {
+            $NewObject.SecurityRule = $Entry.rule
+        }
+            
+        # Nat Properties
+        if ($Entry.'nat-rule') {
+            $NewObject.NatRule = $Entry.'nat-rule'
+            $NewObject.Nat     = $true
+        } else {
+            $NewObject.Nat     = [System.Convert]::ToBoolean($Entry.nat)
+        }
+        
+        if ($Entry.'nat-src') {
+            $NewObject.SourceNat            = [System.Convert]::ToBoolean($Entry.'nat-src')
+            if ($NewObject.SourceNat) {
+                $NewObject.TranslatedSource     = $Entry.s2c.dport
+                $NewObject.TranslatedSourcePort = $Entry.s2c.dst
+            }
+        } else {
+            $NewObject.SourceNat            = [System.Convert]::ToBoolean($Entry.srcnat)
+            if ($NewObject.SourceNat) {
+                $NewObject.TranslatedSource     = $Entry.xsource
+                $NewObject.TranslatedSourcePort = $Entry.xsport
+            }
+        }
+                         
+        if ($Entry.'nat-dst') {
+            $NewObject.DestinationNat            = [System.Convert]::ToBoolean($Entry.'nat-dst')
+            if ($NewObject.DestinationNat) {
+                $NewObject.TranslatedDestination     = $Entry.c2s.dport
+                $NewObject.TranslatedDestinationPort = $Entry.c2s.dst
+            }
+        } else {
+            $NewObject.DestinationNat            = [System.Convert]::ToBoolean($Entry.dstnat)
+            if ($NewObject.DestinationNat) {
+                $NewObject.TranslatedDestination     = $Entry.xdst
+                $NewObject.TranslatedDestinationPort = $Entry.xdport
+            }
+        }
+        
+        
+        
+        
+        
+        if ($Entry.c2s) {
+            $NewObject.Source     = $Entry.c2s.source
+            $NewObject.SourcePort = $Entry.c2s.sport
+            $NewObject.SourceUser = $Entry.c2s.'src-user'
+            
+            $NewObject.Destination     = $Entry.c2s.dst
+            $NewObject.DestinationPort = $Entry.c2s.dport
+            $NewObject.DestinationUser = $Entry.c2s.'dst-user'
+            
+            $NewObject.Protocol  = $Entry.c2s.proto
+            $NewObject.State     = $Entry.c2s.state
+            
+            $NewObject.SourceZone = $Entry.c2s.'source-zone'
+        } else {
+            $NewObject.Source     = $Entry.source
+            $NewObject.SourceZone = $Entry.from
+            $NewObject.SourcePort = $Entry.sport
+            
+            $NewObject.Destination     = $Entry.dst
+            $NewObject.DestinationPort = $Entry.dport
+            
+            $NewObject.Protocol  = $Entry.proto
+            $NewObject.State     = $Entry.state 
+        }
+        
+        if ($Entry.s2c) {
+            $NewObject.DestinationZone = $Entry.s2c.'source-zone'
+        } else {
+            $NewObject.DestinationZone = $Entry.to
+        }
+    }
 
     return $ReturnObject
 }
