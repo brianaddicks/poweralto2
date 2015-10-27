@@ -89,10 +89,7 @@ function Get-PaSession {
 
     $ReturnObject = @()
     
-    
-    
     $FilterString = ""
-    
     
     $FilterHash = @{ "application"       = $Application
                      "destination"       = $Destination
