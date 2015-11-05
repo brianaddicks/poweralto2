@@ -268,8 +268,9 @@ function Resolve-PaRuleField {
                               ( $_ -eq 'UrlCategory' ) -or
                               ( $_ -eq 'SourceUser' ) -or
                               ( $_ -eq 'HipProfile' ) } {
-                                  $NewRule.$Field = $f
-                                  $ReturnObject += $NewRule
+                                  $ValueRule         = $NewRule.psobject.copy()
+                                  $ValueRule.$Field  = $f
+                                  $ReturnObject     += $ValueRule
                               }
                             default {
                                 $Lookup = ($ExpandedObjects | ? { $_.Name -ceq $f }).Value

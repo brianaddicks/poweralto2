@@ -14,16 +14,16 @@ ipmo C:\dev\poweralto2\poweralto2.psd1
 
 
 
-$Device = "10.0.72.2"
+#$Device = "10.0.72.2"
 #$Device = "10.88.128.91"
-$ApiKey = "LUFRPT1XODhhTmV5M3dXMHBYQ2o1bnNUMnc1SEtSb1U9c3JuMTV2Um8yNlRPaTI3UlV1Y2xZSkRQODBLVEIwUVNIbDhtTENNYWhZdz0="
+#$ApiKey = "LUFRPT1XODhhTmV5M3dXMHBYQ2o1bnNUMnc1SEtSb1U9c3JuMTV2Um8yNlRPaTI3UlV1Y2xZSkRQODBLVEIwUVNIbDhtTENNYWhZdz0="
 #$ApiKey = "LUFRPT14MW5xOEo1R09KVlBZNnpnemh0VHRBOWl6TGM9bXcwM3JHUGVhRlNiY0dCR0srNERUQT09"
 
 #IST
 #$Device            = '10.0.72.250'
 #$ApiKey            = 'LUFRPT1CNGVJc3cveXA1OEppdHZxUnRaS1U0YlFTT0E9U2ZoaERxS205ME03RGttWWRxd1UrUT09'
 
-Get-PaDevice $Device -apikey $ApiKey
+#Get-PaDevice $Device -apikey $ApiKey
 <#
 Get-PaApplicationGroupObject
 
