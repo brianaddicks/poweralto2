@@ -28,7 +28,7 @@
 			<ScriptProperty>
 				<Name>RadiusServers</Name>
 				<GetScriptBlock>
-					$this.Servers.Host -join ","
+					$this.Servers.Host -join ", "
 				</GetScriptBlock>
 			</ScriptProperty>
 			<MemberSet>
@@ -44,6 +44,33 @@
 							<Name>Retries</Name>
 							<Name>AdminUseOnly</Name>
 							<Name>RetrieveUserGroup</Name>
+						</ReferencedProperties>
+					</PropertySet>
+				</Members>
+			</MemberSet>
+		</Members>
+	</Type>
+	<Type>
+		<Name>PowerAlto.AuthenticationProfile</Name>
+		<Members>
+			<ScriptProperty>
+				<Name>AllowListTable</Name>
+				<GetScriptBlock>
+					$this.AllowList -join ", "
+				</GetScriptBlock>
+			</ScriptProperty>
+			<MemberSet>
+				<Name>PSStandardMembers</Name>
+				<Members>
+					<PropertySet>
+						<Name>DefaultDisplayPropertySet</Name>
+						<ReferencedProperties>
+							<Name>Name</Name>
+							<Name>Method</Name>
+							<Name>ServerProfile</Name>
+							<Name>AllowList</Name>
+							<Name>LockoutTime</Name>
+							<Name>FailedAttempts</Name>
 						</ReferencedProperties>
 					</PropertySet>
 				</Members>

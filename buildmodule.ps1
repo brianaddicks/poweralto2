@@ -65,8 +65,8 @@ $ManifestParams = @{ Path = $ManifestFile
                      Author             = 'Brian Addicks'
                      RootModule         = 'PowerAlto2.psm1'
                      PowerShellVersion  = '4.0'
-                     TypesToProcess     = @('poweralto.types.ps1xml') }
-                     #FormatsToProcess   = @('poweralto.format.ps1xml') }
+                     TypesToProcess     = @('poweralto.types.ps1xml')
+                     FormatsToProcess   = @('poweralto.format.ps1xml') }
 
 New-ModuleManifest @ManifestParams
 
