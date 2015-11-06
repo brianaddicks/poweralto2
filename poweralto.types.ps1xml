@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Types>
+	<Type>
+		<Name>PowerAlto.Administrator</Name>
+		<Members>
+			<MemberSet>
+				<Name>PSStandardMembers</Name>
+				<Members>
+					<PropertySet>
+						<Name>DefaultDisplayPropertySet</Name>
+						<ReferencedProperties>
+							<Name>Name</Name>
+							<Name>Role</Name>
+							<Name>AdminType</Name>
+							<Name>AuthenticationProfile</Name>
+							<Name>PasswordProfile</Name>
+							<Name>UseCertificate</Name>
+							<Name>UseSshKey</Name>
+						</ReferencedProperties>
+					</PropertySet>
+				</Members>
+			</MemberSet>
+		</Members>
+	</Type>
+</Types>

@@ -1,13 +1,14 @@
-function Get-PaKerberosServerProfile {
+function Get-PaRadiusServerProfile {
     [CmdletBinding()]
     Param (
 		[Parameter(Mandatory=$False,Position=0)]
 		[string]$Name
     )
 
-    $InfoObject   = New-Object PowerAlto.KerberosServerProfile
-    $Xpath        = $InfoObject.BaseXPath
-    $RootNodeName = 'kerberos'
+	$VerbosePrefix = "Get-PaRadiusServerProfile:"
+    $InfoObject    = New-Object PowerAlto.RadiusServerProfile
+    $Xpath         = $InfoObject.BaseXPath
+    $RootNodeName  = 'radius'
 
     if ($Name) { $Xpath += "/entry[@name='$Name']" }
     Write-Debug "xpath: $Xpath"
@@ -25,20 +26,20 @@ function Get-PaKerberosServerProfile {
 
     $ResponseTable = @()
     foreach ($r in $ResponseData) {
-        $ResponseObject = New-Object PowerAlto.KerberosServerProfile
+        $ResponseObject = New-Object PowerAlto.RadiusServerProfile
         
         $ResponseObject.Name   = $r.name
-        $ResponseObject.Realm  = $r.realm
         $ResponseObject.Domain = $r.domain
         
         foreach ($Server in $r.server.entry) {
-            $KerberosServer          = New-Object PowerAlto.KerberosServer
-            $KerberosServer.Name     = $Server.name
-            $KerberosServer.Host     = $Server.host
+            $NewServer          = New-Object PowerAlto.RadiusServer
+            $NewServer.Name     = $Server.name
+            $NewServer.Host     = $Server."ip-address"
+			$NewServer.Secret   = $Server.secret
             if ($Server.port) {
-                $KerberosServer.Port     = $Server.port
+                $NewServer.Port     = $Server.port
             }
-            $ResponseObject.Servers += $KerberosServer
+            $ResponseObject.Servers += $NewServer
         }
         
         $ResponseTable += $ResponseObject

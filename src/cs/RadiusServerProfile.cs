@@ -1,16 +1,16 @@
 namespace PowerAlto {
-	public class Administrator : PowerAltoBaseObject {
-		public string Name { get; set; }
-		public string AuthenticationProfile { get; set; }
-		public bool UseCertificate;
-		public bool UseSshKey;
-		public string AdminType;
-		public string Role;
-		public string PasswordProfile;
+	public class RadiusServerProfile : PowerAltoBaseObject {
+		public string Name;
+		public bool AdminUseOnly;
+		public string Domain;
+		public int Timeout;
+		public int Retries;
+		public bool RetrieveUserGroup;
+		public List<RadiusServer> Servers;
 		
 		public string BaseXPath {
 			get {
-				return "/config/mgt-config/users";
+				return "/config/shared/server-profile/radius";
 			}
 		}
 		
@@ -21,15 +21,14 @@ namespace PowerAlto {
 		}
 		
 		public override XElement Xml () {
-						
+                    
 			// Create root
 			XDocument XmlObject = new XDocument();
 			
 			// create entry nod and define name attribute
 			XElement xmlEntry = new XElement("entry");
 			xmlEntry.SetAttributeValue("name",this.Name);
-			XmlObject.Add(xmlEntry);
-			
+			XmlObject.Add(xmlEntry);			
 
 			return XmlObject.Element("entry");
 		}

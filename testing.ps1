@@ -13,6 +13,9 @@ if ($PushToStrap) {
 ipmo C:\dev\poweralto2\poweralto2.psd1
 
 
+$Device = "10.10.72.2"
+$ApiKey = "LUFRPT1SanJaQVpiNEg4TnBkNGVpTmRpZTRIamR4OUE9Q2lMTUJGREJXOCs3SjBTbzEyVSt6UT09"
+
 
 #$Device = "10.0.72.2"
 #$Device = "10.88.128.91"
