@@ -22,4 +22,32 @@
 			</MemberSet>
 		</Members>
 	</Type>
+	<Type>
+		<Name>PowerAlto.RadiusServerProfile</Name>
+		<Members>
+			<ScriptProperty>
+				<Name>RadiusServers</Name>
+				<GetScriptBlock>
+					$this.Servers.Host -join ","
+				</GetScriptBlock>
+			</ScriptProperty>
+			<MemberSet>
+				<Name>PSStandardMembers</Name>
+				<Members>
+					<PropertySet>
+						<Name>DefaultDisplayPropertySet</Name>
+						<ReferencedProperties>
+							<Name>Name</Name>
+							<Name>Domain</Name>
+							<Name>Servers</Name>
+							<Name>Timeout</Name>
+							<Name>Retries</Name>
+							<Name>AdminUseOnly</Name>
+							<Name>RetrieveUserGroup</Name>
+						</ReferencedProperties>
+					</PropertySet>
+				</Members>
+			</MemberSet>
+		</Members>
+	</Type>
 </Types>
