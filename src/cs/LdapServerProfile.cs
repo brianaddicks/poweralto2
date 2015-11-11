@@ -1,16 +1,23 @@
 namespace PowerAlto {
-	public class RadiusServerProfile : PowerAltoBaseObject {
+	public class LdapServerProfile : PowerAltoBaseObject {
 		public string Name;
 		public bool AdminUseOnly;
+		public List<LdapServer> Servers;
+		
 		public string Domain;
-		public int Timeout;
-		public int Retries;
-		public bool RetrieveUserGroup;
-		public List<RadiusServer> Servers;
+		public string Type;
+		public string Base;
+		public string BindDn;
+		public string BindPassword;
+		
+		public bool Ssl;
+		public int TimeLimit;
+		public int BindTimeLimit;
+		public int RetryInterval;
 		
 		public string BaseXPath {
 			get {
-				return "/config/shared/server-profile/radius";
+				return "/config/shared/server-profile/ldap";
 			}
 		}
 		
@@ -33,9 +40,9 @@ namespace PowerAlto {
 			return XmlObject.Element("entry");
 		}
 		
-		public RadiusServerProfile () {
-			this.Timeout = 3;
-			this.Retries = 3;
+		public LdapServerProfile () {
+			this.TimeLimit = 30;
+			this.BindTimeLimit = 30;
 		}    
 	}
 }
