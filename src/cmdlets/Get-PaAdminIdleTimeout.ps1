@@ -1,9 +1,9 @@
-function Get-PaManagementAcl {
+function Get-PaAdminIdleTimeout {
     [CmdletBinding()]
     Param (
     )
 
-    $Xpath        = "/config/devices/entry/deviceconfig/system/permitted-ip"
+    $Xpath        = "/config/devices/entry/deviceconfig/setting/management/idle-timeout"
     $RootNodeName = 'permitted-ip'
 
     Write-Debug "xpath: $Xpath"
@@ -16,7 +16,7 @@ function Get-PaManagementAcl {
         $ResponseData = Get-PaConfig -Xpath $Xpath -Action $Action
     } catch {
         if ($_ -match "No such node.") {
-            return @("0.0.0.0/0")
+            return "60 minutes"
         } else {
             Throw $_
         }
@@ -27,10 +27,7 @@ function Get-PaManagementAcl {
     if ($ResponseData.$RootNodeName) { $ResponseData = $ResponseData.$RootNodeName } `
                                 else { $ResponseData = $ResponseData               }
 
-    $ResponseTable = @()
-    foreach ($Entry in $ResponseData.Entry) {
-        $ResponseTable += $Entry.Name
-    }	
+    $ResponseTable = $ResponseData."idle-timeout"
 
-    return $ResponseTable
+    return $ResponseTable + " minutes"
 }

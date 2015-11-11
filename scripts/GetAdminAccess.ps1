@@ -27,12 +27,26 @@ function HelperCombineCsvToExcel {
 		[Array]$Csvs,
 		
 		[Parameter(Mandatory=$True,Position=1)]
-		[string]$OutputFile
+		[string]$OutputFile,
+		
+		[Parameter(Mandatory=$False)]
+		[switch]$OverWrite
 	)
+	
+	if (Test-Path $OutputFile) {
+		if ($OverWrite) {
+			try {
+				rm $OutputFile -Force -ErrorAction Stop
+			} catch {
+				Throw "Cannot Remove $OutputFile"
+			}
+		} else {
+			Throw "File exists at $OutputFile. Use -OverWrite to replace it"
+		}
+	}
 
 	$excelapp = new-object -comobject Excel.Application
 	$excelapp.sheetsInNewWorkbook = $csvs.Count
-	$excelapp.DisplayAlerts = $false
 	$xlsx = $excelapp.Workbooks.Add()
 	$sheet=1
 	
@@ -64,12 +78,16 @@ function HelperCombineCsvToExcel {
 			$column=1
 			$row++
 		}
+		Write-Verbose "AutoFit Rows"
 		$AutoFit = $Worksheet.UsedRange.EntireRow.Autofit()
+		Write-Verbose "AutoFit Columns"
 		$AutoFit = $Worksheet.UsedRange.EntireColumn.Autofit()
 		$sheet++
 	}
 	
+	Write-Verbose "Saving workbook $OutputFile"
 	$xlsx.SaveAs($OutputFile)
+	Write-Verbose "Exiting excel"
 	$excelapp.quit()
 }
 
@@ -187,18 +205,68 @@ foreach ($AuthProfile in $AdminAuthProfiles) {
 	}	
 }
 
+#############################################################
+# Management methods/acl
+
+$ManagementMethod       = Get-PaManagementServices
+$ManagementPermittedIps = Get-PaManagementAcl
+$ManagementTimeout      = Get-PaAdminIdleTimeout
+
+$ManagementOutput = @()
+$Properties = $ManagementMethod.psobject.Properties.name | ? { $_ -notmatch "xpath" }
+foreach ($Property in $Properties) {
+	$NewObject         = "" | Select Name,Value
+	$NewObject.Name    = "$Property`:"
+	$NewObject.Value   = $ManagementMethod.$Property
+	$ManagementOutput += $NewObject
+}
+
+$NewObject         = "" | Select Name,Value
+$NewObject.Name    = "PermittedIps:"
+$NewObject.Value   = $ManagementPermittedIps -join "`r`n"
+$ManagementOutput += $NewObject
+
+$NewObject         = "" | Select Name,Value
+$NewObject.Name    = "Admin Idle Timeout:"
+$NewObject.Value   = $ManagementTimeout
+$ManagementOutput += $NewObject
+
+$NewObject         = "" | Select Name,Value
+$NewObject.Name    = "Installed Version:"
+$NewObject.Value   = $Version
+$ManagementOutput += $NewObject
+
+$NewObject         = "" | Select Name,Value
+$NewObject.Name    = "Latest Available Version:"
+$NewObject.Value   = $LatestOsVersion
+$ManagementOutput += $NewObject
+
+#############################################################
+# Logging
+
+$Logging  = @()
+$Logging += Get-PaSystemLogSettings
+$Logging += Get-PaConfigLogSettings
+
+
+#############################################################
+# Output
 
 if ($OutputDir) {
-	$AdminOutput       | Export-Csv "$OutputDir\AdminAccounts.csv" -NoTypeInformation
-	$SnmpSettings      | Export-Csv "$OutputDir\SnmpSettings.csv"  -NoTypeInformation
-	$AuthProfileOutput | Export-Csv "$OutputDir\Authprofiles.csv"  -NoTypeInformation
+	$AdminOutput       | Export-Csv "$OutputDir\AdminAccounts.csv"     -NoTypeInformation
+	$SnmpSettings      | Export-Csv "$OutputDir\SnmpSettings.csv"      -NoTypeInformation
+	$AuthProfileOutput | Export-Csv "$OutputDir\Authprofiles.csv"      -NoTypeInformation
+	$ManagementOutput  | Export-Csv "$OutputDir\ManagementMethods.csv" -NoTypeInformation
+	$Logging           | Export-Csv "$OutputDir\Logging.csv" -NoTypeInformation
 	if ($CombineToXlsx) {
 		$Csvs = @()
 		$Csvs += "$OutputDir\AdminAccounts.csv"
 		$Csvs += "$OutputDir\SnmpSettings.csv"
 		$Csvs += "$OutputDir\Authprofiles.csv"
+		$Csvs += "$OutputDir\ManagementMethods.csv"
+		$Csvs += "$OutputDir\Logging.csv"
 			
-		HelperCombineCsvToExcel $Csvs "$OutputDir\Firewall-Findings.xlsx"
+		HelperCombineCsvToExcel $Csvs "$OutputDir\Firewall-Findings.xlsx" -OverWrite
 	}
 }
 
