@@ -15,9 +15,9 @@ $ApiKey = $DeviceConnectionDetails.ApiKey
 
 $IpMaskRx = [regex] '^(\d+\.){3}\d+\/\d{1,2}$'
 $IpRx     = [regex] '^(\d+\.){3}\d+$'
-$Connect       = Get-PaDevice -Device $Device -ApiKey $ApiKey
+$Connect  = Get-PaDevice -Device $Device -ApiKey $ApiKey
 
-<#
+
 ipmo C:\dev\poweralto2\PowerAlto2.psd1
 ipmo ipv4math
 
