@@ -31,6 +31,10 @@ function Get-PaDynamicBlockList {
         $ResponseObject.Description = $r.description
         $ResponseObject.Source      = $r.url
         
+        $UpdateInterval = ($r.recurring | gm -Type property).Name
+        
+        $ResponseObject.UpdateInterval = $UpdateInterval
+        $ResponseObject.UpdateTime     = $r.recurring.$UpdateInterval.at
 
         $ResponseTable += $ResponseObject
     }

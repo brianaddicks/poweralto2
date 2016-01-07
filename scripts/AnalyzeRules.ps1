@@ -25,17 +25,18 @@ ipmo ipv4math
 
 $test = read-host "continue?"
 
-$Rules         = Get-PaSecurityRule
-$Routes        = Get-PaActiveRoute
-$ValidRoutes   = $Routes | ? { $_.NextHop -notmatch 'vr\ '}
-$Interfaces    = Get-PaInterfaceConfig
-$Zones         = Get-PaZone
-$Addresses     = Get-PaAddressObject
-$AddressGroups = Get-PaAddressGroupObject
-$Services      = Get-PaService
-$ServicGroups  = Get-PaServiceGroup
-$AppGroups     = Get-PaApplicationGroupObject
-$NatPolicies   = Get-PaNatPolicy
+$Rules             = Get-PaSecurityRule
+$Routes            = Get-PaActiveRoute
+$ValidRoutes       = $Routes | ? { $_.NextHop -notmatch 'vr\ '}
+$Interfaces        = Get-PaInterfaceConfig
+$Zones             = Get-PaZone
+$Addresses         = Get-PaAddressObject
+$AddressGroups     = Get-PaAddressGroupObject
+$Services          = Get-PaService
+$ServicGroups      = Get-PaServiceGroup
+$AppGroups         = Get-PaApplicationGroupObject
+$NatPolicies       = Get-PaNatPolicy
+$DynamicBlockLists = Get-PaDynamicBlockList
 
 $Test = read-host "continue?"
 
@@ -85,6 +86,12 @@ foreach ($a in $AddressGroups) {
     $ExpandedObjects += $NewObject
 }
 
+foreach ($d in $DynamicBlockLists) {
+    $NewObject        = "" | Select Name,Value
+    $NewObject.Name   = $d.Name
+    $NewObject.Value  = "(dbl) " + $d.Name
+    $ExpandedObjects += $NewObject
+}
 
 function Resolve-PaServiceGroup {
 [CmdletBinding()]
