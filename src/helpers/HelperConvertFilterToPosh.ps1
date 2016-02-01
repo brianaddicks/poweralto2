@@ -17,7 +17,7 @@
     foreach ($f in $FilterSplit) {
         switch ($f) {
             { $_ -match '^(and|or)$' } { $MatchString += " -$f " }
-                               default { $MatchString += "( `$_.$Property -contains $f )" }
+                               default { $MatchString += "( `$_.$Property -contains `"$f`" )" }
         }
     }
     $MatchString += " }"

@@ -34,7 +34,20 @@ namespace PowerAlto {
         public string Protocol { get; set; }
 
         public string Name { get; set; }
-        public string Model { get; set; }
+        private string model;
+        public string Model {
+            get {
+                return this.model;
+            }
+            set {
+                this.model = value;
+                if (this.model.Contains("anorama")) {
+                    this.type = "panorama";
+                } else {
+                    this.type = "firewall";
+                }
+            }
+        }
         public string Serial { get; set; }
 
         public string OsVersion { get; set; }
@@ -43,6 +56,16 @@ namespace PowerAlto {
         public string ThreatVersion { get; set; }
         public string WildFireVersion { get; set; }
         public string UrlVersion { get; set; }
+        
+        private string type;
+        public string Type {
+            get {
+                return this.type;
+            }
+        }
+        
+        public List<string> ManagedDevices;
+        
         public XmlDocument LastXmlResult { get; set; }
 
         public string ApiUrl {
