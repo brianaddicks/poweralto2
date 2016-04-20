@@ -15,8 +15,7 @@ ipmo C:\dev\poweralto2\poweralto2.psd1
 
 $Device  = "10.10.72.2"
 $ApiKey  = "LUFRPT1SanJaQVpiNEg4TnBkNGVpTmRpZTRIamR4OUE9Q2lMTUJGREJXOCs3SjBTbzEyVSt6UT09"
-$Device  = "10.88.72.2"
-$ApiKey  = "LUFRPT1jcFBhMnp2WGFrSmFsbVVHZ2k5Nm1sQTlheUE9WDI0dENOdnplTlFBRnZQd3I5Zm5FUUhYbkF2c1RnTlNPOTZIdkx0V0xUUT0="
+
 $Connect = Get-PaDevice $Device -apikey $ApiKey
 
 
