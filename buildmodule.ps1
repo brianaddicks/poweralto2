@@ -204,7 +204,7 @@ $Output | Out-File $OutputFile -Force
 if ($PushToStrap) {
     $FilesToZip = ls "$PSScriptRoot\poweralto*" -Exclude *.zip
     $CreateZip = ZipFiles -ZipFilePath "$PSScriptRoot\poweralto2.zip" -SourceFiles $FilesToZip -Force
-    $StageFolder = '\\vmware-host\Shared Folders\Dropbox\strap\stages\poweralto2\'
+    $StageFolder = $DropboxPath + '\strap\stages\poweralto2\'
     $Copy = Copy-Item "$PSScriptRoot\poweralto2.zip" $StageFolder -Force
 }
 

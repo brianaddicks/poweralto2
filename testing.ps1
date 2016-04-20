@@ -15,7 +15,31 @@ ipmo C:\dev\poweralto2\poweralto2.psd1
 
 $Device  = "10.10.72.2"
 $ApiKey  = "LUFRPT1SanJaQVpiNEg4TnBkNGVpTmRpZTRIamR4OUE9Q2lMTUJGREJXOCs3SjBTbzEyVSt6UT09"
-#$Connect = Get-PaDevice $Device -apikey $ApiKey
+$Device  = "10.88.72.2"
+$ApiKey  = "LUFRPT1jcFBhMnp2WGFrSmFsbVVHZ2k5Nm1sQTlheUE9WDI0dENOdnplTlFBRnZQd3I5Zm5FUUhYbkF2c1RnTlNPOTZIdkx0V0xUUT0="
+$Connect = Get-PaDevice $Device -apikey $ApiKey
+
+
+$Now       = Get-Date
+$Date      = get-date $now.AddDays(-7) -format "yyyy/MM/dd HH:mm:ss"
+$Query     = "(( eventid eq globalprotectgateway-auth-succ ) and ( receive_time geq '$Date' ))" 
+$LogJob    = Get-PaLog -LogType system -Query $Query -WaitForJob
+
+$UsernameRx = [regex] "User\ name:\ ([^\,]+?),"
+
+foreach ($Entry in $Logjob.log.logs.entry) {
+    $UsernameMatch = $UsernameRx.Match($Entry.opaque)
+    if ($UsernameMatch.Success) {
+        $UsernameMatch.Groups[1].Value
+    }
+}
+
+#$LogResult = Get-PaLog -Action get -job $LogJob.job 
+
+
+
+#( eventid eq globalprotectgateway-auth-succ ) and ( receive_time geq '2016/04/13 09:18:00' )
+
 
 #$Device = "10.0.72.2"
 #$Device = "10.88.128.91"
