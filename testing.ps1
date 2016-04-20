@@ -26,13 +26,15 @@ $Query     = "(( eventid eq globalprotectgateway-auth-succ ) and ( receive_time 
 $LogJob    = Get-PaLog -LogType system -Query $Query -WaitForJob
 
 $UsernameRx = [regex] "User\ name:\ ([^\,]+?),"
-
+$Users = @()
 foreach ($Entry in $Logjob.log.logs.entry) {
     $UsernameMatch = $UsernameRx.Match($Entry.opaque)
     if ($UsernameMatch.Success) {
-        $UsernameMatch.Groups[1].Value
+        $Users += $UsernameMatch.Groups[1].Value
     }
 }
+
+$Users | Select -unique
 
 #$LogResult = Get-PaLog -Action get -job $LogJob.job 
 
