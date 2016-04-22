@@ -7,6 +7,10 @@ function Get-PaLog {
         [Parameter(Mandatory=$False,ParameterSetName="newlog")]
 		[string]$Query,
         
+        [Parameter(Mandatory=$False,ParameterSetName="newlog")]
+        [ValidateRange(20,5000)]
+		[int]$NumberOfLogs = 20,
+        
         [Parameter(Mandatory=$True,Position=0,ParameterSetName="getlog")]
 		[string]$Action,
         
@@ -24,6 +28,7 @@ function Get-PaLog {
     if ($LogType) {
         $QueryTable."log-type" = $LogType
         $QueryTable.query      = $Query
+        $QueryTable.nlogs      = $NumberOfLogs
     } else {
         $QueryTable.action   = $Action
         $QueryTable."job-id" = $Job
