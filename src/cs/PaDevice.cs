@@ -32,6 +32,7 @@ namespace PowerAlto {
         public int Port { get; set; }
         public string ApiKey { get; set; }
         public string Protocol { get; set; }
+        public string DeviceGroup { get; set; }
 
         public string Name { get; set; }
         private string model;
@@ -43,11 +44,13 @@ namespace PowerAlto {
                 this.model = value;
                 if (this.model.Contains("anorama")) {
                     this.type = "panorama";
+                    this.DeviceGroup = "shared";
                 } else {
                     this.type = "firewall";
                 }
             }
         }
+        
         public string Serial { get; set; }
 
         public string OsVersion { get; set; }

@@ -7,8 +7,8 @@ function Get-PaAddressObject {
         [Parameter(Mandatory=$False)]
         [switch]$Candidate
     )
-
-    $Xpath = "/config/devices/entry/vsys/entry/address"
+    
+    $Xpath = HelperCreateXpath "address"
 
     if ($Name) { $Xpath += "/entry[@name='$Name']" }
 
