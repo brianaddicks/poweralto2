@@ -68,6 +68,7 @@ namespace PowerAlto {
         }
         
         public List<string> ManagedDevices;
+        public List<License> Licenses;
         
         public XmlDocument LastXmlResult { get; set; }
 
