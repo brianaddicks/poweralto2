@@ -165,6 +165,53 @@ Add-Type -ReferencedAssemblies @(
 ###############################################################################
 # Add Cmdlets
 
+function CombinePsFiles {
+    [CmdletBinding()]
+    Param (
+    	[Parameter(Mandatory=$True,Position=0)]
+		[array]$CmdletFiles,
+
+        [Parameter(Mandatory=$True,Position=0)]
+        [array]$HelperFiles,
+
+        [Parameter(Mandatory=$False)]
+        [string]$CmdletHeader,
+
+        [Parameter(Mandatory=$False)]
+        [string]$HelperHeader,
+
+        [Parameter(Mandatory=$False)]
+        [string]$FunctionHeader,
+
+        [Parameter(Mandatory=$False)]
+        [string]$Footer
+    )
+
+    $ReturnObject = @()
+    $ReturnObject += $CmdletHeader
+
+    foreach ($File in $CmdletFiles) {
+        $File = ls $File.FullName
+        $ReturnObject += ($FunctionHeader + $File.BaseName)
+        $ReturnObject += gc $File
+        $ReturnObject += ""
+    }
+
+    $ReturnObject += $HelperHeader
+
+    foreach ($File in $HelperFiles) {
+        $File = ls $File.FullName
+        $ReturnObject += ($FunctionHeader + $File.BaseName)
+        $ReturnObject += gc $File
+        $ReturnObject += ""
+    }
+
+    $ReturnObject += $Footer
+
+    return $ReturnObject
+}
+<#
+
 $Output = $CmdletHeader
 
 foreach ($l in $(ls $CmdletPath)) {
@@ -198,6 +245,17 @@ $Output += $Footer
 
 ###############################################################################
 # Output File
+#>
+
+$CombineParams = @{}
+$CombineParams.CmdletFiles    = ls $CmdletPath
+$CombineParams.HelperFiles    = ls $HelperPath
+$CombineParams.CmdletHeader   = $CmdletHeader
+$CombineParams.HelperHeader   = $HelperHeader
+$CombineParams.FunctionHeader = $FunctionHeader
+$CombineParams.Footer         = $Footer
+
+$Output = CombinePsFiles @CombineParams
 
 $Output | Out-File $OutputFile -Force
 
