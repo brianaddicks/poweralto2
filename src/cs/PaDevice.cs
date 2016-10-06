@@ -35,6 +35,7 @@ namespace PowerAlto {
         public string DeviceGroup { get; set; }
 
         public string Name { get; set; }
+        public string IpAddress { get; set; }
         private string model;
         public string Model {
             get {

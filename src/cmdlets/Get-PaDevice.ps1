@@ -128,6 +128,7 @@ function Get-PaDevice {
 		$Data = $Data.system
 
         $global:PaDeviceObject.Name            = $Data.hostname
+		$global:PaDeviceObject.IpAddress       = $Data.'ip-address'
         $global:PaDeviceObject.Model           = $Data.model
         $global:PaDeviceObject.Serial          = $Data.serial
         $global:PaDeviceObject.OsVersion       = $Data.'sw-version'

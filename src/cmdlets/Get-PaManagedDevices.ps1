@@ -13,6 +13,7 @@ function Get-PaManagedDevices {
         $ResponseObject = New-Object PowerAlto.PaDevice
 
         $ResponseObject.Name            = $r.hostname
+		$ResponseObject.IpAddress       = $r.'ip-address'
         $ResponseObject.Model           = $r.model
         $ResponseObject.Serial          = $r.serial
         $ResponseObject.OsVersion       = $r.'sw-version'
