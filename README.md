@@ -1,2 +1,5 @@
-poweralto2
+PowerAlto2
 ==========
+
+PowerShell Module that wraps Palo Alto API calls.
+
