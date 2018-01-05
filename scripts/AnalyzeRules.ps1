@@ -1,44 +1,59 @@
+[CmdletBinding()]
+    Param (
+        [Parameter(Mandatory=$True,Position=0)]
+        [ValidatePattern("\d+\.\d+\.\d+\.\d+|(\w\.)+\w")]
+        [string]$DeviceAddress,
+
+        [Parameter(Mandatory=$True,Position=1)]
+        [string]$ApiKey,
+
+        [Parameter(Mandatory=$True,Position=2)]
+        [string]$OutputCsv
+    )
+
 ###############################################
 # Start of actual script
 
 
-#$VerbosePreference = 'Continue'
-#$Device            = "10.10.72.2"
-
-$ParentDir  = $PSScriptRoot
-#$ApiKeyPath = "$ParentDir\secret-apikey.txt"
-#$ApiKey     = Get-Content $ApiKeyPath
-
-$DeviceConnectionDetails = gc $ParentDir\secret-apikey.json | ConvertFrom-Json
-$Device = $DeviceConnectionDetails.IpAddress
-$ApiKey = $DeviceConnectionDetails.ApiKey
-
 $IpMaskRx = [regex] '^(\d+\.){3}\d+\/\d{1,2}$'
 $IpRx     = [regex] '^(\d+\.){3}\d+$'
-$Connect  = Get-PaDevice -Device $Device -ApiKey $ApiKey
+Write-Verbose "$VerbosePrefix Attempting to connect to device: $DeviceAddress"
+$Connect  = Get-PaDevice -Device $DeviceAddress -ApiKey $ApiKey
+Write-Verbose "$VerbosePrefix Successfully connected to device: $DeviceAddress"
 
 
-ipmo C:\dev\poweralto2\PowerAlto2.psd1
+ipmo poweralto2
 ipmo ipv4math
 
 
 
-$test = read-host "continue?"
+#$test = read-host "continue?"
 
+Write-Verbose "Pulling Rules"
 $Rules             = Get-PaSecurityRule
+Write-Verbose "Pulling Routes"
 $Routes            = Get-PaActiveRoute
 $ValidRoutes       = $Routes | ? { $_.NextHop -notmatch 'vr\ '}
+Write-Verbose "Pulling Interfaces"
 $Interfaces        = Get-PaInterfaceConfig
+Write-Verbose "Pulling Zones"
 $Zones             = Get-PaZone
+Write-Verbose "Pulling Addresses"
 $Addresses         = Get-PaAddressObject
+Write-Verbose "Pulling Address Groups"
 $AddressGroups     = Get-PaAddressGroupObject
+Write-Verbose "Pulling Service"
 $Services          = Get-PaService
-$ServicGroups      = Get-PaServiceGroup
+Write-Verbose "Pulling Service Groups"
+$ServiceGroups      = Get-PaServiceGroup
+Write-Verbose "Pulling Application Groups"
 $AppGroups         = Get-PaApplicationGroupObject
+Write-Verbose "Pulling Nats"
 $NatPolicies       = Get-PaNatPolicy
-$DynamicBlockLists = Get-PaDynamicBlockList
+#Write-Verbose "Pulling DynamicBlockLists"
+#$DynamicBlockLists = Get-PaDynamicBlockList
 
-$Test = read-host "continue?"
+#$Test = read-host "continue?"
 
 $ExpandedObjects = @()
 
@@ -59,18 +74,43 @@ function Resolve-PaAddressGroup {
     
     $Group = $AddressGroupObjects | ? { $_.Name -ceq $AddressGroup }
 
-    foreach ($m in $Group.Members) {
-        $GroupLookup = $AddressGroupObjects | ? { $_.Name -ceq $m }
-        $AddressLookup = $AddressObjects | ? { $_.Name -ceq $m }
-        if ($GroupLookup) {
-            $ReturnObject += Resolve-PaAddressGroup $m $AddressGroupObjects $AddressObjects
-        } elseif ($AddressLookup) {
-            $ReturnObject += $AddressLookup.Address
+    switch ($Group.Type) {
+        'static' {
+            foreach ($m in $Group.Members) {
+                $GroupLookup = $AddressGroupObjects | ? { $_.Name -ceq $m }
+                $AddressLookup = $AddressObjects | ? { $_.Name -ceq $m }
+                if ($GroupLookup) {
+                    $ReturnObject += Resolve-PaAddressGroup $m $AddressGroupObjects $AddressObjects
+                } elseif ($AddressLookup) {
+                    $ReturnObject += $AddressLookup.Address
+                }
+            }
+            break
+        }
+        'dynamic' {
+            $Filter = $Group.Filter -replace "('.+?')",'( -contains $1)'
+            $Filter = $Filter.Replace(" -",'$_.Tags -')
+            $Filter = $Filter.Replace('and','-and')
+            $Filter = $Filter.Replace('or','-or')
+            Write-Verbose "Filter: $Filter"
+            $Expression = '$AddressObjects | Where-Object { ' + $Filter + '}'
+            Write-Verbose "Expression: $Expression"
+            $MatchedAddresses = Invoke-Expression -Command $Expression
+            foreach ($Address in $MatchedAddresses) {
+                $ReturnObject += $Address.Address
+            }
         }
     }
 
     return $ReturnObject
 }
+
+<#
+$Rx = [regex] "'(.+?)'"
+$test = "'public' and 'hvac'"
+$test = $test -replace "('.+?')", '( -contains $1)'
+$test.Replace(" -",'$_.Tags -')
+#>
 
 foreach ($a in $Addresses) {
     $NewObject        = "" | Select Name,Value
@@ -295,6 +335,10 @@ function Resolve-PaRuleField {
                                     if ($Field -eq 'Application') {
                                         $NewRule.$Field = $f
                                         $ReturnObject += $NewRule
+                                    } elseif (($Field -match 'Address') -and ($NewRule.$Field -match "[A-Z]{2}")) {
+                                        # This is to account for Regions, need to come up with a better solution
+                                        $NewRule.$Field = $f
+                                        $ReturnObject += $NewRule
                                     } else {
                                         Throw "No Lookup Found for $Field`: $f"
                                     }
@@ -491,5 +535,5 @@ foreach ($Policy in $StaticNats) {
     }
 }
 
-$ResolvedRules | select Number,Name,Disabled,Allow,Source*,Dest*,UrlCategory,NatDest,Service,Application,*Profile*,NatName,Notes | Export-Csv C:\temp\rules.csv -NoTypeInformation
+$ResolvedRules | select Number,Name,Disabled,Allow,Source*,Dest*,UrlCategory,NatDest,Service,Application,*Profile*,NatName,Notes | Export-Csv $OutputCsv -NoTypeInformation
 #>
